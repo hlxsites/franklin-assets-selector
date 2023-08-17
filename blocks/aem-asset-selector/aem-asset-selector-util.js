@@ -29,6 +29,7 @@ function load(cfg) {
     modalMode: true,
     imsEnvironment,
     env: imsEnvironment,
+    onAccessTokenReceived: cfg.onAccessTokenReceived || (() => {}),
   };
   // eslint-disable-next-line no-undef
   const registeredTokenService = PureJSSelectors.registerAssetsSelectorsAuthService(imsProps);
@@ -53,8 +54,8 @@ export function init(cfg, callback) {
 }
 
 function onClose() {
-  // const selectorDialog = document.getElementById('asset-selector-dialog');
-  // selectorDialog.close();
+  const selectorDialog = document.getElementById('asset-selector-dialog');
+  selectorDialog.close();
 }
 
 async function getAssetPublicUrl(url) {
