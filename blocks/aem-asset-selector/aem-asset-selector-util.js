@@ -53,8 +53,7 @@ export function init(cfg, callback) {
 }
 
 function onClose() {
-  const selectorDialog = document.getElementById('asset-selector-dialog');
-  selectorDialog.close();
+  document.getElementById('asset-selector-dialog').close();
 }
 
 async function getAssetPublicUrl(url) {
@@ -83,7 +82,6 @@ async function handleSelection(selection) {
       maxRendition = rendition;
     }
   });
-  console.log('Selected rendition:', maxRendition.href);
 
   const assetPublicUrl = await getAssetPublicUrl(maxRendition.href.substring(0, maxRendition.href.indexOf('?')));
   console.log('Asset public URL:', assetPublicUrl);
