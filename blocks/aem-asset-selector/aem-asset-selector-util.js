@@ -57,7 +57,6 @@ const AS_MFE = 'https://experience.adobe.com/solutions/CQ-assets-selectors/stati
 const IMS_ENV_STAGE = 'stg1';
 const IMS_ENV_PROD = 'prod';
 const API_KEY = 'franklin';
-const PROXY = 'https://html-transfer-cf-worker.satyadeep.workers.dev';
 const WEB_TOOLS = 'https://master-sacred-dove.ngrok-free.app';
 const REL_DOWNLOAD = 'http://ns.adobe.com/adobecloud/rel/download';
 const REL_RENDITIONS = 'http://ns.adobe.com/adobecloud/rel/rendition';
@@ -160,9 +159,9 @@ export function init(cfg, callback) {
  * Generates a URL that can be used to retrieve an asset's binary
  * without authentication.
  * @param {string} url URL to the asset in AEM.
- * @returns {Promise} Resolves with the proxied asset URL.
+ * @returns {Promise} Resolves with the public asset URL.
  */
-async function getAssetProxyUrl(url) {
+async function getAssetPublicUrl(url) {
   const response = await fetch(`${WEB_TOOLS}/asset-bin?src=${url}`, {
     headers: {
       Authorization: `Bearer ${imsInstance.getImsToken()}`,
@@ -177,45 +176,6 @@ async function getAssetProxyUrl(url) {
   }
   const json = await response.json();
   return json['asset-url'];
-}
-
-/**
- * Retrieves the blob for an asset by first attempting to retrieve the
- * raw content from AEM, then by going through a proxy if that fails.
- * @param {string} url URL of the asset to retrieve.
- * @returns {Promise<Blob>} Resolves with the asset's raw content.
- */
-// eslint-disable-next-line no-unused-vars
-async function getAssetBlob(url) {
-  let response;
-  const sharedHeaders = {
-    Authorization: `Bearer ${imsInstance.getImsToken()}`,
-    'x-api-key': API_KEY,
-  };
-
-  try {
-    response = await fetch(url, {
-      headers: {
-        ...sharedHeaders,
-        accept: '*/*',
-      },
-    });
-  } catch (e) {
-    logMessage('Error fetching asset, trying proxy');
-    response = await fetch(`${PROXY}?src=${url}`, {
-      headers: sharedHeaders,
-    });
-  }
-
-  if (!response) {
-    throw new Error('Did not receive response to request');
-  }
-
-  if (!response.ok) {
-    throw new Error(`Received unexpected status code ${response.status}: ${response.statusText}`);
-  }
-
-  return response.blob();
 }
 
 /**
@@ -301,7 +261,7 @@ export async function copyAssetWithoutRapi(asset) {
     return false;
   }
   try {
-    const assetPublicUrl = await getAssetProxyUrl(maxRendition.href.substring(0, maxRendition.href.indexOf('?')));
+    const assetPublicUrl = await getAssetPublicUrl(maxRendition.href.substring(0, maxRendition.href.indexOf('?')));
     if (!assetPublicUrl) {
       logMessage('Unable to generate public url for copy');
       return false;
