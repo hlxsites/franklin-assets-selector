@@ -52,7 +52,7 @@ export default async function decorate(block) {
     if (selected) {
       copy.classList.add('disabled');
       copy.innerText = 'Copying...';
-      let copyMethod = cfg['use-rapi'] ? copyAssetWithRapi : copyAssetWithoutRapi;
+      const copyMethod = cfg['use-rapi'] ? copyAssetWithRapi : copyAssetWithoutRapi;
       const success = await copyMethod(selected);
       if (success) {
         copy.innerText = 'Copied!';
