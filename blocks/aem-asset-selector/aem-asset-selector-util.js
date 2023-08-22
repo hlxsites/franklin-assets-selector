@@ -193,6 +193,9 @@ function getCopyRendition(asset) {
     return maxRendition;
   }
   renditions
+    // TODO: the clipboard API only supports using PNGs as the blob, so
+    // only using PNG renditions. Will be fixed to allow altnernate
+    // formats in a follow-up ticket
     .filter((rendition) => rendition.type === 'image/png')
     .forEach((rendition) => {
       if ((!maxRendition || maxRendition.width < rendition.width)) {
