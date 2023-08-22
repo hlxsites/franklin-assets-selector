@@ -271,7 +271,7 @@ export async function copyAssetWithoutRapi(asset) {
     }
     await copyToClipboardWithHtml(assetPublicUrl);
   } catch (e) {
-    logMessage('error copying asset to clipboard', e);
+    logMessage('Error copying asset to clipboard', e);
     return false;
   }
   return true;
