@@ -62,6 +62,7 @@ const REL_DOWNLOAD = 'http://ns.adobe.com/adobecloud/rel/download';
 const REL_RENDITIONS = 'http://ns.adobe.com/adobecloud/rel/rendition';
 // TODO: change this to Asset Link IMS client ID
 const IMS_CLIENT_ID = 'p66302-franklin';
+const ASSET_SELECTOR_ID = 'asset-selector';
 
 let imsInstance = null;
 let imsEnvironment = IMS_ENV_PROD;
@@ -83,6 +84,9 @@ function logMessage(...theArgs) {
  * @param {string} rel The rel to retrieve.
  */
 function getRel(repositoryMetadata, rel) {
+  if (!repositoryMetadata) {
+    return undefined;
+  }
   // eslint-disable-next-line no-underscore-dangle
   return repositoryMetadata._links[rel];
 }
@@ -169,7 +173,7 @@ async function getAssetPublicUrl(url) {
     },
   });
   if (!response) {
-    throw new Error('Did not receive response from request');
+    throw new Error('No response from request');
   }
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}: ${response.statusText}`);
@@ -234,11 +238,14 @@ async function copyToClipboardWithHtml(assetPublicUrl) {
 async function copyToClipboardWithBinary(assetPublicUrl, mimeType) {
   const binary = await fetch(assetPublicUrl);
 
-  if (!binary.ok) {
+  if (!binary || !binary.ok) {
     throw new Error(`Unexpected status code ${binary.status} retrieving asset binary`);
   }
 
   const blob = await binary.blob();
+  if (!blob) {
+    throw new Error('No blob provided in asset response');
+  }
   const clipboardOptions = {};
   clipboardOptions[mimeType] = blob;
   const data = [
@@ -260,7 +267,7 @@ async function copyToClipboardWithBinary(assetPublicUrl, mimeType) {
 export async function copyAssetWithoutRapi(asset) {
   const maxRendition = getCopyRendition(asset);
   if (!maxRendition) {
-    logMessage('No suitable rendition to copy found');
+    logMessage('No rendition to copy found');
     return false;
   }
   try {
@@ -294,7 +301,7 @@ export async function copyAssetWithRapi(asset) {
   }
   const rendition = getCopyRendition(asset);
   if (!rendition) {
-    logMessage('No suitable rendition to copy found');
+    logMessage('No rendition to copy found');
     return false;
   }
   const download = getRel(rendition, REL_DOWNLOAD);
@@ -310,10 +317,14 @@ export async function copyAssetWithRapi(asset) {
       },
     });
     if (!res.ok) {
-      logMessage(`Download request for rendition binary returned unexpected status code ${res.status}: ${res.statusText}`);
+      logMessage(`Download request for rendition binary failed with status code ${res.status}: ${res.statusText}`);
       return false;
     }
     const downloadJson = await res.json();
+    if (!downloadJson) {
+      logMessage('Rendition download JSON not provided');
+      return false;
+    }
     await copyToClipboardWithBinary(downloadJson.href, downloadJson.type);
   } catch (e) {
     logMessage('error copying asset to clipboard', e);
@@ -328,7 +339,7 @@ export async function copyAssetWithRapi(asset) {
  * @returns {HTMLElement} The asset selector.
  */
 function getAssetSelector() {
-  return document.getElementById('asset-selector');
+  return document.getElementById(ASSET_SELECTOR_ID);
 }
 
 /**
@@ -341,6 +352,9 @@ function getAssetSelector() {
 function handleAssetSelection(selection, cfg) {
   if (cfg) {
     if (selection.length && cfg.onAssetSelected) {
+      if (selection.length > 0) {
+        logMessage('Multiple items received in selection, but only the first will be used');
+      }
       cfg.onAssetSelected(selection[0]);
     } else if (!selection.length && cfg.onAssetDeselected) {
       cfg.onAssetDeselected();

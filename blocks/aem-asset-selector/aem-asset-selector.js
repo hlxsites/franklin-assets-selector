@@ -19,6 +19,8 @@ import {
   copyAssetWithRapi,
 } from './aem-asset-selector-util.js';
 
+const LOGIN_TIMEOUT = 2000;
+
 export default async function decorate(block) {
   let rendered = false;
   let selected = false;
@@ -28,7 +30,7 @@ export default async function decorate(block) {
     <div class="asset-overlay loading">
       <img id="loading" src="${cfg.loading}" />
       <div id="login">
-        <p>Welcome to the Asset Selector! Please sign in to view your assets.</p>
+        <p>Welcome to the Asset Selector. Please sign in to view your assets.</p>
         <button id="as-login">Sign In</button>
       </div>
     </div>
@@ -79,7 +81,7 @@ export default async function decorate(block) {
       block.querySelector('#loading').style.display = 'none';
       block.querySelector('#login').style.display = 'flex';
     }
-  }, 2000);
+  }, LOGIN_TIMEOUT);
 
   // this will be sent by the auth service if the user has a token, meaning
   // they're logged in. if that happens, hide the login overlay and show
