@@ -375,7 +375,7 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
     handleAssetSelection: (e) => handleAssetSelection(e, cfg),
     env: cfg.environment ? cfg.environment.toUpperCase() : 'PROD',
     apiKey: API_KEY,
-    hideTreeNav: false,
+    hideTreeNav: true,
     runningInUnifiedShell: false,
     noWrap: true,
     filterSchema: [
