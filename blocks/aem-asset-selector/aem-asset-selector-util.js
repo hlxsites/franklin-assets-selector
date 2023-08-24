@@ -375,9 +375,59 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
     handleAssetSelection: (e) => handleAssetSelection(e, cfg),
     env: cfg.environment ? cfg.environment.toUpperCase() : 'PROD',
     apiKey: API_KEY,
-    hideTreeNav: true,
+    hideTreeNav: false,
     runningInUnifiedShell: false,
     noWrap: true,
+    filterSchema: [
+      {
+        header: 'File Type',
+        groupKey: 'TopGroup',
+        fields: [
+          {
+            element: 'checkbox',
+            name: 'type',
+            defaultValue: ['image/*'],
+            readOnly: true,
+            options: [
+              {
+                label: 'Images',
+                value: 'image/*',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        fields:
+              [
+                {
+                  element: 'checkbox',
+                  name: 'type',
+                  options: [
+                    {
+                      label: 'JPG',
+                      value: 'image/jpeg',
+                    },
+                    {
+                      label: 'PNG',
+                      value: 'image/png',
+                    },
+                    {
+                      label: 'TIFF',
+                      value: 'image/tiff',
+                    },
+                    {
+                      label: 'GIF',
+                      value: 'image/gif',
+                    },
+                  ],
+                  columns: 2,
+                },
+              ],
+        header: 'Mime Types',
+        groupKey: 'MimeTypeGroup',
+      },
+    ],
   };
 
   if (cfg['repository-id']) {
