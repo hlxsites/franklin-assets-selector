@@ -420,6 +420,10 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
                       label: 'GIF',
                       value: 'image/gif',
                     },
+                    {
+                      label: 'WEBP',
+                      value: 'image/webp',
+                    },
                   ],
                   columns: 2,
                 },
@@ -435,6 +439,9 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
   }
   if (cfg['ims-org-id']) {
     assetSelectorProps.imsOrg = cfg['ims-org-id'];
+  }
+  if (cfg['ims-token']) {
+    assetSelectorProps.imsToken = cfg['ims-token'];
   }
 
   // eslint-disable-next-line no-undef
