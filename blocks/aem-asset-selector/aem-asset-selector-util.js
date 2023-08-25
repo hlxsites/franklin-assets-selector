@@ -390,7 +390,7 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
             readOnly: true,
             options: [
               {
-                label: formatMessage(i18nSymbols.fileTypeFolder),
+                label: 'Directories,
                 value: 'directory',
               },
               {
