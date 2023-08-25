@@ -390,7 +390,7 @@ export async function renderAssetSelectorWithImsFlow(cfg) {
             readOnly: true,
             options: [
               {
-                label: 'Directories,
+                label: 'Directories',
                 value: 'directory',
               },
               {
