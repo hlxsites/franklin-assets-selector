@@ -8,7 +8,7 @@
     "blockName": [ 
     	{ 
         	"mimeType": "video/*", 
-        	"value": "Video" 
+        	"value": "Embed" 
     	} 
 	] 
 }
