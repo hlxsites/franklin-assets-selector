@@ -20,17 +20,20 @@
   },
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
+    "@babel/core": "7.23.6",
+    "@babel/eslint-parser": "7.23.3",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/exec": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "semantic-release": "22.0.12",
-    "@babel/core": "7.23.6",
-    "@babel/eslint-parser": "7.23.3",
     "chai": "4.3.7",
     "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.29.1",
+    "semantic-release": "22.0.12",
     "stylelint": "16.0.2",
     "stylelint-config-standard": "35.0.0"
+  },
+  "dependencies": {
+    "aem": "^0.1.0"
   }
 }
