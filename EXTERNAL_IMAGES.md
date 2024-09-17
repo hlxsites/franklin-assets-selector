@@ -43,3 +43,24 @@ export function decorateMain(main) {
 During the page rendering process, the frontend code replaces the anchor tags identified as exteernal images on the page with the `picture` tags with `src`/`srcset` attributes set as the external image's url as specified in the external image link placed on the Word / Google Document during the page authoring process.
 
 Authors can optionally specify query paramaters in the hyperlinked external url and they would be retained in the `picture` tag's `src`/`srcset` attributes. These are useful for specifying image delivery parameters such as image width, height, format, etc. as understood by the external image delivery service.
+
+## Preview for an external image along with alt text support
+
+The above approach works well for external images, but it can be challenging for authors to determine which images are being used on the page. This issue can be addressed by using a preview image instead of the URL or external image markup. The external delivery URL can be stored in the image’s alt text attribute. A client script then parses this alt text attribute to replace the URL with the actual delivery URL while also preserving the accessible alt text.
+Check sample page [here](https://main--franklin-assets-selector--hlxsites.hlx.live/delivery-images-example)
+
+
+**Asset selector support :**
+
+The Asset Selector supports copying images with the alt text attribute containing both the delivery URL and the alt text by default. To enable this feature, set the `copyMode` configuration to `use-alt-text` as outlined in [here](https://github.com/hlxsites/franklin-assets-selector/commit/5f5318203746ec192b1b8293003c787851035082)
+
+Here is the sample alt text content which can be seen with copied asset from asset selector
+  ```
+    {
+      "deliveryUrl": "https://delivery-p66302-e574366.adobeaemcloud.com/adobe/dynamicmedia/deliver/urn:aaid:aem:ced69e3f-dda1-487c-921f-f1547476a4b4/seoname.webp?quality=60",
+      "altText": "Mapple trees"
+    }
+  ```
+
+
+
