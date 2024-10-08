@@ -1,2 +1,5 @@
 mountpoints:
-  /: https://adobe.sharepoint.com/:f:/r/sites/HelixProjects/Shared%20Documents/sites/aem-assets
+  /: https://mega.nz/folder/yvpWXJzb#ZD-9CWMuz7tcHoNDzg4Bww
+
+folders:
+  /products/: /products/default
