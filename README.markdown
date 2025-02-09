@@ -6,8 +6,8 @@ This project boilerplate is for Edge Delivery Services projects that integrate w
 https://experienceleague.adobe.com/developer/commerce/storefront/
 
 ## Environments
-- Preview: https://main--showcase-evergreen-commerce-storefront--blueacorninc.aem.page
-- Live: https://main--showcase-evergreen-commerce-storefront--blueacorninc.aem.live
+- Preview: https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.page
+- Live: https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live
 - Commerce (Frontend): http://stage-sandbox.m2cloud.blueacorn.net
 - Commerce (Backend): https://stage-sandbox.m2cloud.blueacorn.net/admin_baici/
 
