@@ -1,0 +1,31 @@
+{
+	"name": "Evergreen Storefront",
+
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+		
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	"postCreateCommand": "npm install",
+	"postAttachCommand": "npm start",
+	
+	"forwardPorts": [3000],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ryanluker.vscode-coverage-gutters"
+			]
+		}
+	},
+	"features": {
+		"ghcr.io/christophermacgown/devcontainer-features/direnv:1": {}
+	},
+
+	"portsAttributes": {
+		"3000": {
+		  "label": "Adobe Commerce Storefront (HTTP)"
+		}
+
+
+
+}

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_VERSION=--lts
+    entrypoint: sleep infinity
+    volumes:
+      - ../..:/workspaces:cached
+  cors-anywhere:
+    image: tlan16/cors-anywhere
+    ports:
+      - "8080:8080"
