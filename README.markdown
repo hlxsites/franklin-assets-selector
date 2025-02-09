@@ -8,6 +8,8 @@ https://experienceleague.adobe.com/developer/commerce/storefront/
 ## Environments
 - Preview: https://main--showcase-evergreen-commerce-storefront--blueacorninc.aem.page
 - Live: https://main--showcase-evergreen-commerce-storefront--blueacorninc.aem.live
+- Commerce (Frontend): http://stage-sandbox.m2cloud.blueacorn.net
+- Commerce (Backend): https://stage-sandbox.m2cloud.blueacorn.net/admin_baici/
 
 ## Content (Document-based Authoring)
 
