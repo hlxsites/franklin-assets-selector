@@ -1,5 +1,5 @@
 mountpoints:
-  # /: https://adobe.sharepoint.com/:f:/r/sites/HelixProjects/Shared%20Documents/sites/starter-content-commerce
-  /: https://groupinfosysus.sharepoint.com/:f:/s/AppBuilderTeam/El9ztRPbAyRCrt3p-H3UX4oB62sM2DNoYx78Q6u7Ws72-A?e=JbqdZW
+  /: https://adobe.sharepoint.com/:f:/r/sites/HelixProjects/Shared%20Documents/sites/starter-content-commerce
+  # /: https://groupinfosysus.sharepoint.com/:f:/s/AppBuilderTeam/El9ztRPbAyRCrt3p-H3UX4oB62sM2DNoYx78Q6u7Ws72-A?e=JbqdZW
 folders:
   /products/: /products/default
