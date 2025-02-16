@@ -2,6 +2,8 @@
 
 Store locators for Edge Delivery Services, perhaps with an App Builder accompaniment.
 
+[View Demo](https://locator--showcase-evergreen-commerce-storefront--blueacorninc.hlx.page/store-locator/)
+
 ## Technical Approach
 
 Helix exposes the [store-locator/stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46zqc73RS_NhzvkxTmgPbSRN0Vsunjla-tzUAyw/edit?gid=1909637118#gid=1909637118) as [hlx.live/store-locator/stores.json](https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/store-locator/stores.json) that is consumed by the `store-locator` block in this directory.
