@@ -12,19 +12,18 @@ Edit [store-locator/stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46
 
 The experience will be driven by a combination of this block and the [store-locator/index doc](https://docs.google.com/document/d/1PPViXzysO9FdQouEtEPp1pmww1NrJScWgIy0KxmKsPQ/edit?tab=t.0#heading=h.nbh8hvrzlmhd). The doc will contain a `store-locator` table that will be used to place and configure the block in runtime. 
 
-## Installation 
+## Installation
 
-Add the following file structure to your document-based project:
+1. Add [this folder](https://drive.google.com/drive/u/0/folders/1jaCzCSbFBAAQPr0816HJuUqfMMGRcRiK) to your document-based project:
 
-* [Store Locator Source Docs](https://drive.google.com/drive/u/0/folders/1jaCzCSbFBAAQPr0816HJuUqfMMGRcRiK)
+2. Then configure the [stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46zqc73RS_NhzvkxTmgPbSRN0Vsunjla-tzUAyw/edit?gid=1909637118#gid=1909637118) to suit your needs. 
 
-Then configure the [stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46zqc73RS_NhzvkxTmgPbSRN0Vsunjla-tzUAyw/edit?gid=1909637118#gid=1909637118) to suit your needs. 
 
 ## Sample Data
 
 This is to be imported into a `/store-locator/stores.<xlsx|gsheet>` that tracks the stores and allows you to manage meta data. Data provided by data.gov where you can find the [source csv](https://opendata.dc.gov/api/download/v1/items/1d7c9d0e3aac49c1aa88d377a3bae430/csv?layers=4). This will also be reflected in the [stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46zqc73RS_NhzvkxTmgPbSRN0Vsunjla-tzUAyw/edit?gid=1909637118#gid=1909637118)
 
 
+## Note about App Builder
 
-
- 
+This experience _can_ be built entirely using document-based authoring. Let's work out if we need an App Builder accompaniment, and if so what would it drive and how.
