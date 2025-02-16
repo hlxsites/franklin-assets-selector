@@ -20,7 +20,7 @@ export default async function decorate(block) {
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '&copy; <a href="https://www.blueacornici.com/">Blue Acorn iCi</a>'
             }).addTo(map);
 
             // Invalidate the map size to ensure it renders correctly
@@ -52,7 +52,7 @@ export default async function decorate(block) {
                 // Add marker to the map
 
                 // L.marker([store.X, store.Y]).addTo(map)
-                
+
                 // // Add click event to the row to show the callout
                 // row.addEventListener('click', () => {
                 //     marker.openPopup();
