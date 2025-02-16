@@ -14,6 +14,11 @@ Edit [store-locator/stores sheet](https://docs.google.com/spreadsheets/d/1zk2k46
 
 The experience will be driven by a combination of this block and the [store-locator/index doc](https://docs.google.com/document/d/1PPViXzysO9FdQouEtEPp1pmww1NrJScWgIy0KxmKsPQ/edit?tab=t.0#heading=h.nbh8hvrzlmhd). The doc will contain a `store-locator` table that will be used to place and configure the block in runtime. 
 
+### Todo
+
+* let's create `aio-app-commerce-store-locator` and use this [Admin UI SDK Example](https://github.com/adobe/adobe-commerce-samples/tree/main/admin-ui-sdk/menu/custom-menu) to add an entry to the admin for this, and expose some capability.
+
+
 ## Installation
 
 1. Add [this folder](https://drive.google.com/drive/u/0/folders/1jaCzCSbFBAAQPr0816HJuUqfMMGRcRiK) to your document-based project:
