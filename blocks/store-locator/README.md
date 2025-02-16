@@ -2,7 +2,7 @@
 
 Store locators for Edge Delivery Services, perhaps with an App Builder accompaniment.
 
-[View Demo](https://locator--showcase-evergreen-commerce-storefront--blueacorninc.hlx.page/store-locator/)
+[View Demo](https://locator--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/store-locator/)
 
 ## Technical Approach
 
