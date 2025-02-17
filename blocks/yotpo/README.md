@@ -36,6 +36,7 @@ To use this block, configure the following in the `configs` sheet.
 - [ ] Verify the Yotpo instance ID and URL in the `configs` sheet and make this block reference them, they are currently hardcoded.
 - [ ] Review documentation and see how this reviews widget can be configured, add configurability to it so that, from the table in the block, I can add a key/value pair for any personalization options. Document them all in this readme.
 - [ ] Test the Yotpo Reviews block integration on a staging environment.
+- [ ] Looks like there are several types of blocks we could make, i.e. just stars, highlighted review, etc. Let's make different blocks for all the major pieces, this one would be renamed to `yotpo-product-review` or something that makes snese.
 - [ ] Ensure the Yotpo script tags are correctly injected by `yotpo.js`.
 - [ ] Validate the Yotpo Reviews block rendering on different devices and browsers.
 - [ ] Update documentation with any changes or additional configuration steps.
