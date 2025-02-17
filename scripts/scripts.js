@@ -194,6 +194,10 @@ async function loadEager(doc) {
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
+    // Artificial Delay eager loading of the page for 2 seconds - for demo only
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
   }
 
   sampleRUM.enhance();

@@ -73,6 +73,8 @@ function getVideojsScripts() {
   };
 }
 
+// This function waits for the videojs script and css to be loaded
+// and returns a promise which resolves when both are loaded
 async function waitForVideoJs() {
   return new Promise((resolve) => {
     const { scriptTag, cssLink } = getVideojsScripts();
@@ -92,17 +94,23 @@ async function waitForVideoJs() {
 }
 
 async function loadVideoJs() {
+  // If videojs script and css html tags
+  // are already present but not loaded, wait for them to be loaded and return
   const { scriptTag, cssLink } = getVideojsScripts();
   if (scriptTag && cssLink) {
     await waitForVideoJs();
     return;
   }
 
+  // We are here means that the videojs script and css html tags
+  // are not present in the head, so we need to load them
   await Promise.all([
     loadCSS(VIDEO_JS_CSS),
     loadScript(VIDEO_JS_SCRIPT),
   ]);
 
+  // Once the script and css are loaded, set the dataset.loaded attribute
+  // to true and dispatch a custom event to notify that videojs is loaded
   const { scriptTag: jsScript, cssLink: css } = getVideojsScripts();
   jsScript.dataset.loaded = true;
   css.dataset.loaded = true;
@@ -219,14 +227,28 @@ function setupPlayer(url, videoContainer, config) {
   const videojsConfig = {
     ...config,
     preload: poster && !config.autoplay ? 'none' : 'auto',
-    poster,
   };
+
+  if (poster) {
+    videojsConfig.poster = poster;
+  }
+
+  if (!videojsConfig.posterImage) {
+    delete videojsConfig.posterImage;
+  }
 
   if (config.autoplay) {
     videojsConfig.muted = true;
     videojsConfig.loop = true;
     videojsConfig.autoplay = true;
   }
+
+  videojsConfig.html5 = {
+    vhs: {
+      useDevicePixelRatio: true,
+      customPixelRatio: window.devicePixelRatio ?? 1,
+    },
+  };
 
   // eslint-disable-next-line no-undef
   const player = videojs(videoElement, videojsConfig);
@@ -442,7 +464,6 @@ async function decorateVideoModal(block, config) {
   const container = document.createElement('div');
   container.classList.add('video-component');
 
-  const posterImage = config.posterImage.cloneNode(true);
   const playButton = document.createElement('button');
   playButton.setAttribute('aria-label', 'Play video');
   playButton.classList.add('video-play-button');
@@ -457,8 +478,12 @@ async function decorateVideoModal(block, config) {
     await openModal(config);
   });
 
-  container.append(posterImage);
   container.append(playButton);
+
+  if (config.posterImage) {
+    const posterImage = config.posterImage.cloneNode(true);
+    container.append(posterImage);
+  }
 
   block.innerHTML = '';
   block.append(container);
@@ -470,20 +495,25 @@ async function decorateVideoModal(block, config) {
 }
 
 export default async function decorate(block) {
-  if (typeof window.DELAYED_PHASE !== 'undefined') {
-    // DELAYED_PHASE is defined, so hook to delayed-phase
-    if (window.DELAYED_PHASE) {
-      loadVideoJs();
+  // If block is delayed, we'd load it in a delayed manner
+  if (block.classList.contains('delayed')) {
+    if (typeof window.DELAYED_PHASE !== 'undefined') {
+      // DELAYED_PHASE is defined, so hook to delayed-phase
+      if (window.DELAYED_PHASE) {
+        loadVideoJs();
+      } else {
+        const delayedPhaseHandler = async () => {
+          document.removeEventListener('delayed-phase', delayedPhaseHandler);
+          await loadVideoJs();
+        };
+        document.addEventListener('delayed-phase', delayedPhaseHandler);
+      }
     } else {
-      const delayedPhaseHandler = async () => {
-        document.removeEventListener('delayed-phase', delayedPhaseHandler);
-        await loadVideoJs();
-      };
-      document.addEventListener('delayed-phase', delayedPhaseHandler);
+      // DELAYED_PHASE is not defined, so don't hook to delayed-phase event
+      setTimeout(loadVideoJs, 3000);
     }
   } else {
-    // DELAYED_PHASE is not defined, so don't hook to delayed-phase event
-    setTimeout(loadVideoJs, 3000);
+    await loadVideoJs();
   }
 
   const config = parseConfig(block);
