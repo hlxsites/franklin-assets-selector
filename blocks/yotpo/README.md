@@ -4,7 +4,7 @@ Yotpo Review block for Adobe Commerce Storefront
 
 * [Yotpo Reviews Installation Guide](https://support.yotpo.com/docs/generic-other-platforms-installing-yotpo-reviews-v3)
 * [Yotpo Dashoard](https://reviews.yotpo.com/#/home)
-* [View Demo](https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/yotpo/)
+* [View Demo](https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/yotpo)
 
 ## Technical Approach
 
@@ -13,7 +13,7 @@ This approach is intended for Adobe Commerce Storefront with document based auth
 
 When Helix renders this page, it will parse the table and run the `yotpo.js` in this directory. This file will add the needed script tags to enable Yotpo, and inject the needed `<div>` tag into the block allowing Yotpo to present. 
 
-As a result, Yotpo can be easily integrated into the storefront wherever a merchant wants to display it. See it in action [here](https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/yotpo/).
+As a result, Yotpo can be easily integrated into the storefront wherever a merchant wants to display it. See it in action [here](https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live/yotpo).
 
 ## Block Options
 
