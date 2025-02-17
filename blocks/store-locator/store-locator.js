@@ -1,5 +1,36 @@
 export default async function decorate(block) {
     try {
+        // Function to load external scripts
+        const loadScript = (src) => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        };
+
+        // Function to load external stylesheets
+        const loadStylesheet = (href) => {
+            return new Promise((resolve, reject) => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = href;
+                link.onload = resolve;
+                link.onerror = reject;
+                document.head.appendChild(link);
+            });
+        };
+
+        // Load Leaflet CSS and JS if not already loaded
+        if (!document.querySelector('link[href="https://unpkg.com/leaflet/dist/leaflet.css"]')) {
+            await loadStylesheet('https://unpkg.com/leaflet/dist/leaflet.css');
+        }
+        if (!document.querySelector('script[src="https://unpkg.com/leaflet/dist/leaflet.js"]')) {
+            await loadScript('https://unpkg.com/leaflet/dist/leaflet.js');
+        }
+
         const response = await fetch('/store-locator/stores.json');
         const stores = await response.json();
         console.log('Stores:', stores);
@@ -20,7 +51,7 @@ export default async function decorate(block) {
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.blueacornici.com/">Blue Acorn iCi</a>'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             // Invalidate the map size to ensure it renders correctly
@@ -50,14 +81,14 @@ export default async function decorate(block) {
                 table.appendChild(row);
 
                 // Add marker to the map
+                const marker = L.marker([store.YCOORD, store.XCOORD]).addTo(map)
+                    .bindPopup(`<b>${store.STORENAME}</b><br>${store.ADDRESS}`);
 
-                // L.marker([store.X, store.Y]).addTo(map)
-
-                // // Add click event to the row to show the callout
-                // row.addEventListener('click', () => {
-                //     marker.openPopup();
-                //     map.setView([store.Y, store.X], 13);
-                // });
+                // Add click event to the row to show the callout
+                row.addEventListener('click', () => {
+                    marker.openPopup();
+                    map.setView([store.YCOORD, store.XCOORD], 13);
+                });
             });
 
             block.insertBefore(table, block.lastChild);
@@ -66,7 +97,3 @@ export default async function decorate(block) {
         console.error('Error fetching store data:', error);
     }
 }
-
-// Include the Leaflet CSS and JS in your HTML
-// <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-// <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
