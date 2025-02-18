@@ -4,7 +4,7 @@ import he from 'he';
 import productSearchQuery from './queries/products.graphql.js';
 import { variantsFragment } from './queries/variants.graphql.js';
 
-const basePath = 'https://www.aemshop.net';
+const basePath = 'https://main--showcase-evergreen-commerce-storefront--blueacorninc.hlx.live';
 const configFile = `${basePath}/configs.json?sheet=prod`;
 
 export async function commerceEndpointWithQueryParams(config) {
