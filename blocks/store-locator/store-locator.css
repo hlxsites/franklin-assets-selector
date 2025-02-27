@@ -1,21 +1,70 @@
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 18px;
-    text-align: left;
+.store-cards-container {
+    margin: 2rem 0;
+
+    div,
+    p,
+    a {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+
 }
 
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+.store-card {
+    padding: 1.5rem 0;
+    box-shadow: inset 0 1px 0 0 var(--color-neutral-400);
+
+    h4,
+    div,
+    p,
+    a {
+        margin: 0;
+        padding: 0;
+    }
+
+    .store-card__header {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .store-card__title {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    .store-card__rating {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .store-card__rating .star {
+        scale: .6;
+        margin-left: -2.6rem;
+    }
+
+    .store-card__rating-text {
+        margin-left: -2rem;
+    }
+
+    .store-card__phone {
+        font-size: 1.2rem !important;
+        line-height: 1.6rem !important;
+    }
 }
 
-th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+.store-card:hover {
+    background-color: var(--color-neutral-200);
 }
 
-tr:hover {
-    background-color: #f5f5f5;
+
+
+/* START LEAFLET MAP */
+.leaflet-popup-close-button {
+    display: none;
 }
+
+.leaflet-popup-content {
+    text-align: center;
+}
+
+/* END LEAFLET MAP */

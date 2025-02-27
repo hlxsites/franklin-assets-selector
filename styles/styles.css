@@ -14,6 +14,7 @@
 
 /* stylelint-disable no-empty-source */
 :root, .dropin-design {
+  --color-brand-blue-acorn: #236df5;
   /* Adobe Commerce Dropin design tokens */
   --color-brand-300: #6d6d6d;
   --color-brand-500: #454545;
