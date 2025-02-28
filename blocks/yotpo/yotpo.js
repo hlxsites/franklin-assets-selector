@@ -31,16 +31,29 @@ export default async function decorate(block) {
         }
 
         // Create and append the Yotpo widget instance
+        const widgetConfig = {
+            "instance-id": '1039593',
+            "product-id": location.pathname.slice(location.pathname.lastIndexOf('/') + 1) || '24-UG04',
+            "name": 'evergreen',
+            "url": location.toString(),
+            "image-url": `https:${document.querySelector('.pdp-carousel__slide>img').getAttribute('src')}`,
+            "price": document.querySelector('.dropin-price').innerText.slice(1) || '0',
+            "currency": 'USD'
+        }
         const yotpoWidget = document.createElement('div');
         yotpoWidget.className = 'yotpo-widget-instance';
-        yotpoWidget.setAttribute('data-yotpo-instance-id', '1039593');
-        yotpoWidget.setAttribute('data-yotpo-product-id', '1');
-        yotpoWidget.setAttribute('data-yotpo-name', 'samtest');
-        yotpoWidget.setAttribute('data-yotpo-url', 'http://localhost:3000/products/zing-jump-rope/24-UG04');
-        yotpoWidget.setAttribute('data-yotpo-image-url', 'https://stage-sandbox.m2cloud.blueacorn.net/media/catalog/product/u/g/ug04-bk-0.jpg');
-        yotpoWidget.setAttribute('data-yotpo-price', '50');
-        yotpoWidget.setAttribute('data-yotpo-currency', 'USD');
+        Object.entries(widgetConfig).forEach(([key, value]) => {
+            yotpoWidget.setAttribute(`data-yotpo-${key}`, value);
+        });
         
+        // yotpoWidget.setAttribute('data-yotpo-instance-id', '1039593');
+        // yotpoWidget.setAttribute('data-yotpo-product-id', '1');
+        // yotpoWidget.setAttribute('data-yotpo-name', 'samtest');
+        // yotpoWidget.setAttribute('data-yotpo-url', 'http://localhost:3000/products/zing-jump-rope/24-UG04');
+        // yotpoWidget.setAttribute('data-yotpo-image-url', 'https://stage-sandbox.m2cloud.blueacorn.net/media/catalog/product/u/g/ug04-bk-0.jpg');
+        // yotpoWidget.setAttribute('data-yotpo-price', '50');
+        // yotpoWidget.setAttribute('data-yotpo-currency', 'USD');
+
         block.appendChild(yotpoWidget);
 
     } catch (error) {
