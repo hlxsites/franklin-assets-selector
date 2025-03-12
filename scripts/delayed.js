@@ -1,3 +1,3 @@
 document.dispatchEvent(new Event('delayed-phase'));
-Window.DELAYED_PHASE = true;
+Window.LOADING_PHASE = 'delayed';
 // add delayed functionality here
