@@ -34,6 +34,9 @@ header nav[aria-expanded="true"] {
   header nav {
     padding: 0 2rem;
   }
+  header nav .nav-brand img {
+    margin-left: 170px;
+  }
 }
 
 @media (width >= 900px) {
@@ -154,8 +157,9 @@ header .nav-brand {
 }
 
 header nav .nav-brand img {
-  width: 200px;
-  margin: 15px;
+  width: 140px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   height: auto;
 }
 
