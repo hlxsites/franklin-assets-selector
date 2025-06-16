@@ -1,0 +1,5 @@
+mountpoints:
+  /:
+    url: "https://author-p66302-e574366.adobeaemcloud.com/bin/franklin.delivery/thirumalaivm/aem-ue/main"
+    type: "markup"
+    suffix: ".html"
