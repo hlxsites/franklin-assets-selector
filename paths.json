@@ -1,0 +1,10 @@
+{
+  "mappings": [
+    "/content/thiru-ue/:/",
+    "/content/thiru-ue/configuration:/.helix/config.json",
+    "/content/thiru-ue/metadata:/metadata.json"
+  ],
+  "includes": [
+    "/content/thiru-ue/"
+  ]
+}
