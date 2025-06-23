@@ -79,7 +79,18 @@ header {
 }
 
 main {
-  background-color: var(--main-background-color);
+  background-image: url('../resources/summit/splash-screen-img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Optimize for mobile performance */
+@media (max-width: 768px) {
+  main {
+    background-attachment: scroll;
+  }
 }
 
 h1, h2, h3,
