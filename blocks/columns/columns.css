@@ -46,3 +46,18 @@
   overflow: auto; 
 } */
 
+/* Desktop styles */
+.popular-collections .columns-img-col img {
+  object-fit: cover;
+  border-radius: 20px;
+  display: block;
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .popular-collections .columns-img-col img {
+    max-height: 200px; /* Adjust as needed for mobile aspect ratio */
+    border-radius: 16px;
+  }
+}
+
