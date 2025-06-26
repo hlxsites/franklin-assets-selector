@@ -611,7 +611,6 @@ export async function loadBlock(block) {
 // Create an object with the test functions
 const testFunctions = {
   appendQueryParams,
-  decorateImagesFromAlt,
 };
 
 // Export the object
