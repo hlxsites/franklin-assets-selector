@@ -13,21 +13,9 @@
  * get_url_extension('https://example.com/foo.jpg#qux');
  * // returns 'jpg'
  * get_url_extension('https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:db6f951a-3865-42cf-ad38-13a33cff9e75/as/candy-dessert-tiered-cake-43305.avif?assetname=candy%20dessert%20tiered%20cake%2043305.jpg');
- * // returns 'jpg'
+ * // returns 'avif'
  */
 function getUrlExtension(url) {
-  const urlObj = new URL(url);
-  
-  // Check if there's an assetname query parameter with an extension
-  const assetname = urlObj.searchParams.get('assetname');
-  if (assetname) {
-    const assetnameExt = assetname.split('.').pop().trim().toLowerCase();
-    if (assetnameExt && assetnameExt !== assetname) {
-      return assetnameExt;
-    }
-  }
-  
-  // Fall back to original logic
   return url.split(/[#?]/)[0].split('.').pop().trim();
 }
 
@@ -37,10 +25,17 @@ function getUrlExtension(url) {
  * @returns {boolean} Whether the URL has a supported image extension
  * @private
  */
-function hasImageExtension(url) {
+function isImageUrl(url) {
   if (!url) return false;
+  
   const ext = getUrlExtension(url);
-  return ext && ['jpg', 'jpeg', 'png', 'gif', 'webp','avif'].includes(ext.toLowerCase());
+
+  if (ext && ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext.toLowerCase())) return true;
+
+  // Check for '/is/image/' for handling DM image URLs
+  if (url.includes('is/image/')) return true;
+
+  return false;
 }
 
 
@@ -61,7 +56,7 @@ function createWebOptimizedDMOpenAPIUrl(url) {
     const filename = pathname.split('/').pop();
     // Replace /original/as/ with /as/ and change extension to .avif
     const newPathname = pathname
-      .replace('/original/as/', '/as/')
+      .replace(/(?:\/renditions)?\/original\/as\//, '/as/')
       .replace(/\.[^.]+$/, '.avif');
     // Create new URL with modified pathname
     const newUrl = new URL(url.toString());
@@ -129,7 +124,7 @@ function isExternalImage(element) {
   if (!url) return { isExternal: false, createOptimizedPictureHandler: null };
 
     // If it's an anchor tag and the URL doesn't have an image extension, return false
-    if (element.tagName === 'A' && !hasImageExtension(url)) {
+    if (element.tagName === 'A' && !isImageUrl(url)) {
       return { isExternal: false, createOptimizedPictureHandler: null };
     }
   
@@ -337,7 +332,7 @@ export function createOptimizedPictureForDM(
 
   // fallback
   breakpoints.forEach((br, i) => {
-    const searchParams = new URLSearchParams({ wid: br.width, fmt: 'jpeg' });
+    const searchParams = new URLSearchParams({ wid: br.width});
 
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
@@ -375,7 +370,7 @@ export function createOptimizedPictureForDMOpenAPI(
 ) {
   const picture = document.createElement('picture');
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
-  const originalUrl= isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
+  const originalUrl = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const url = createWebOptimizedDMOpenAPIUrl(originalUrl);
   
   // Determine which breakpoints to use
@@ -396,7 +391,7 @@ export function createOptimizedPictureForDMOpenAPI(
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/avif');
     
-    const searchParams = new URLSearchParams({ width: br.width || '2000' });
+    const searchParams = new URLSearchParams({ width: br.width });
     if (useSmartcrop && br.smartcrop) {
       searchParams.set('smartcrop', br.smartcrop);
     }
@@ -411,7 +406,7 @@ export function createOptimizedPictureForDMOpenAPI(
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
       
-      const searchParams = new URLSearchParams({ width: br.width || '2000' });
+      const searchParams = new URLSearchParams({ width: br.width});
       if (useSmartcrop && br.smartcrop) {
         searchParams.set('smartcrop', br.smartcrop);
       }
@@ -430,7 +425,7 @@ export function createOptimizedPictureForDMOpenAPI(
   // For the image src, either use the last breakpoint or a clean URL
   if (finalBreakpoints.length > 0) {
     const lastBreakpoint = finalBreakpoints[finalBreakpoints.length - 1];
-    const searchParams = new URLSearchParams({ width: lastBreakpoint.width || '2000' });
+    const searchParams = new URLSearchParams({ width: lastBreakpoint.width});
     img.setAttribute('src', appendQueryParams(url, searchParams));
   } else {
     img.setAttribute('src', url.toString());
