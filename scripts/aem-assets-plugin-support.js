@@ -10,8 +10,7 @@ export default async function assetsInit() {
     loadBlock,
     createOptimizedPicture,
     decorateExternalImages,
-    createOptimizedPictureForDMOpenAPI,
-    createOptimizedPictureForDM,
+    decorateImagesFromAlt,
   } = await import(`${codeBasePath}/scripts/aem-assets.js`);
   window.hlx = window.hlx || {};
   window.hlx.aemassets = {
@@ -20,16 +19,11 @@ export default async function assetsInit() {
     loadBlock,
     createOptimizedPicture,
     decorateExternalImages,
-    createOptimizedPictureForDMOpenAPI,
-    createOptimizedPictureForDM,
+    decorateImagesFromAlt,
     smartCrops: {
       Small: { minWidth: 0, maxWidth: 767 },
       Medium: { minWidth: 768, maxWidth: 1023 },
       Large: { minWidth: 1024, maxWidth: 9999 },
     },
-    externalImageUrlPrefixes: [
-      ['https://delivery-p66302-e574366.adobeaemcloud.com/', createOptimizedPictureForDMOpenAPI],
-      ['https://s7ap1.scene7.com/is/image/varuncloudready/', createOptimizedPictureForDM],
-    ],
   };
 }
