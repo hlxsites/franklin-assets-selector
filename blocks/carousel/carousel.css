@@ -148,7 +148,7 @@
     left: calc(50% - 3px);
   }
   
-  @media (min-width: 600px) {
+  @media (min-width: 720px) {
     .carousel .carousel-slides-container {
       height: 450px;
     }
@@ -183,7 +183,7 @@
     }
   }
 
-  @media only screen and (max-width: 600px) {
+  @media only screen and (max-width: 720px) {
     .carousel .carousel-slide {
       min-height: unset;
     }
