@@ -79,6 +79,10 @@ function buildAutoBlocks() {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  if (window.hlx.aemassets?.decorateExternalImages) {
+    window.hlx.aemassets.decorateExternalImages(main);
+  }
+  
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
