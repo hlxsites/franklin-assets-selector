@@ -13,10 +13,21 @@ export default function decorate(block) {
   const grid = document.createElement('div');
   grid.className = 'grid-layout';
 
-  [...block.children].forEach((row) => {
+  const rows = [...block.children];
+  const isTwoItems = rows.length === 2;
+
+  rows.forEach((row, idx) => {
     const cells = [...row.children];
     const gridItem = document.createElement('div');
     gridItem.className = 'grid-item';
+
+    // If only two items, place them in the bottom row
+    if (isTwoItems) {
+      // REMOVE these lines:
+      // gridItem.style.gridRow = '2 / 3';
+      // gridItem.style.minHeight = '490px';
+      // gridItem.style.gridColumn = `${idx + 1} / ${idx + 2}`;
+    }
 
     // First cell: color or image
     const firstCell = cells[0];
@@ -49,6 +60,10 @@ export default function decorate(block) {
     gridItem.appendChild(text);
     grid.appendChild(gridItem);
   });
+
+  if (isTwoItems) {
+    grid.classList.add('only-two');
+  }
 
   block.innerHTML = '';
   block.appendChild(grid);
