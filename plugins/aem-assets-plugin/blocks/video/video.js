@@ -4,7 +4,11 @@ const VIDEO_JS_SCRIPT = `${window.hlx.aemassets?.codeBasePath ?? ''}/blocks/vide
 const VIDEO_JS_CSS = `${window.hlx.aemassets?.codeBasePath ?? ''}/blocks/video/videojs/video-js.min.css`;
 const VIDEO_JS_LOAD_EVENT = 'videojs-loaded';
 
-function getDeviceSpecificVideoUrl(videoUrl) {
+function getDeviceSpecificVideoUrl(videoUrl, isProgressive) {
+  if (isProgressive) {
+    return videoUrl.replace(/manifest\.mpd|manifest\.m3u8|play/, 'original/as/video.mp4');
+  }
+
   const { userAgent } = navigator;
   const isIOS = /iPad|iPhone|iPod/.test(userAgent);
   const isSafari = (/Safari/i).test(userAgent) && !(/Chrome/i).test(userAgent) && !(/CriOs/i).test(userAgent) && !(/Android/i).test(userAgent) && !(/Edg/i).test(userAgent);
@@ -15,7 +19,8 @@ function getDeviceSpecificVideoUrl(videoUrl) {
 
 function parseConfig(block) {
   const isAutoPlay = block.classList.contains('autoplay');
-
+  const isProgressive = block.classList.contains('progressive');
+  const isHighestBitrate = block.classList.contains('highestbitrate');
   if (block.classList.contains('hero')) {
     const posterImage = block.querySelector('picture');
     const videoUrl = block.querySelector('div > div:first-child a').href;
@@ -25,12 +30,13 @@ function parseConfig(block) {
 
     return {
       type: 'hero',
-      videoUrl: getDeviceSpecificVideoUrl(videoUrl),
+      videoUrl: getDeviceSpecificVideoUrl(videoUrl, isProgressive),
       isAutoPlay,
       title,
       description,
       button,
       posterImage,
+      highestBitrate: isHighestBitrate,
     };
   }
 
@@ -42,17 +48,19 @@ function parseConfig(block) {
       const description = child.querySelector('div:nth-child(2) > p')?.textContent;
 
       return {
-        videoUrl: getDeviceSpecificVideoUrl(videoUrl),
+        videoUrl: getDeviceSpecificVideoUrl(videoUrl, isProgressive),
         isAutoPlay,
         title,
         description,
         posterImage,
+        highestBitrate: isHighestBitrate,
       };
     });
 
     return {
       type: 'cards',
       cards,
+      highestBitrate: isHighestBitrate,
     };
   }
 
@@ -61,8 +69,9 @@ function parseConfig(block) {
 
   return {
     type: 'modal',
-    videoUrl: getDeviceSpecificVideoUrl(videoUrl),
+    videoUrl: getDeviceSpecificVideoUrl(videoUrl, isProgressive),
     posterImage,
+    highestBitrate: isHighestBitrate,
   };
 }
 
@@ -73,6 +82,8 @@ function getVideojsScripts() {
   };
 }
 
+// This function waits for the videojs script and css to be loaded
+// and returns a promise which resolves when both are loaded
 async function waitForVideoJs() {
   return new Promise((resolve) => {
     const { scriptTag, cssLink } = getVideojsScripts();
@@ -92,17 +103,23 @@ async function waitForVideoJs() {
 }
 
 async function loadVideoJs() {
+  // If videojs script and css html tags
+  // are already present but not loaded, wait for them to be loaded and return
   const { scriptTag, cssLink } = getVideojsScripts();
   if (scriptTag && cssLink) {
     await waitForVideoJs();
     return;
   }
 
+  // We are here means that the videojs script and css html tags
+  // are not present in the head, so we need to load them
   await Promise.all([
     loadCSS(VIDEO_JS_CSS),
     loadScript(VIDEO_JS_SCRIPT),
   ]);
 
+  // Once the script and css are loaded, set the dataset.loaded attribute
+  // to true and dispatch a custom event to notify that videojs is loaded
   const { scriptTag: jsScript, cssLink: css } = getVideojsScripts();
   jsScript.dataset.loaded = true;
   css.dataset.loaded = true;
@@ -205,6 +222,31 @@ function setupAutopause(videoElement, player) {
   observer.observe(videoElement);
 }
 
+function setupProgressiveVideo(url, videoContainer, config) {
+  const videoElement = document.createElement('video');
+
+  // Add basic attributes
+  videoElement.setAttribute('loop', '');
+  videoElement.setAttribute('playsinline', '');
+  videoElement.removeAttribute('controls');
+  videoElement.addEventListener('canplay', () => {
+    videoElement.muted = true;
+    if (config.autoplay) videoElement.play();
+  });
+
+  // Set source
+  videoElement.src = url;
+
+  // Add poster if available
+  if (config.poster) {
+    videoElement.poster = getPosterImage(config.poster);
+  }
+
+  videoContainer.append(videoElement);
+
+  return videoElement;
+}
+
 function setupPlayer(url, videoContainer, config) {
   const videoElement = document.createElement('video');
   videoElement.classList.add('video-js');
@@ -219,14 +261,38 @@ function setupPlayer(url, videoContainer, config) {
   const videojsConfig = {
     ...config,
     preload: poster && !config.autoplay ? 'none' : 'auto',
-    poster,
   };
+
+  if (poster) {
+    videojsConfig.poster = poster;
+  }
+
+  if (!videojsConfig.posterImage) {
+    delete videojsConfig.posterImage;
+  }
 
   if (config.autoplay) {
     videojsConfig.muted = true;
     videojsConfig.loop = true;
     videojsConfig.autoplay = true;
   }
+
+  videojsConfig.html5 = {
+    vhs: {
+      useDevicePixelRatio: true,
+      customPixelRatio: window.devicePixelRatio ?? 1,
+      // Start with highest quality for highestbitrate class
+      limitRenditionByPlayerDimensions: !config.highestBitrate,
+      // Select highest bitrate variant
+      selectionCallback: config.highestBitrate
+        ? (playlistController, representations) => representations.reduce((highest, current) => (
+          (!highest || current.bandwidth > highest.bandwidth)
+            ? current
+            : highest
+        ))
+        : undefined,
+    },
+  };
 
   // eslint-disable-next-line no-undef
   const player = videojs(videoElement, videojsConfig);
@@ -250,6 +316,22 @@ async function decorateVideoPlayer(url, videoContainer, config) {
     videoContainer.append(config.posterImage);
   }
 
+  // Check if progressive playback is requested
+  if (config.progressive) {
+    const player = setupProgressiveVideo(url, videoContainer, config);
+    player.addEventListener('loadeddata', () => {
+      const posterImage = videoContainer.querySelector('picture');
+      if (posterImage) {
+        posterImage.style.display = 'none';
+        setTimeout(() => {
+          player.play();
+        }, 1000);
+      }
+    });
+    return;
+  }
+
+  // Existing VideoJS implementation
   await waitForVideoJs();
   const player = setupPlayer(url, videoContainer, config);
   player.on('loadeddata', () => {
@@ -296,6 +378,8 @@ async function decorateVideoCard(container, config) {
     hasCustomPlayButton: true,
     fill: true,
     posterImage: config.posterImage,
+    progressive: config.progressive,
+    highestBitrate: config.highestBitrate,
   });
 }
 
@@ -335,6 +419,8 @@ async function decorateHeroBlock(block, config) {
     hasCustomPlayButton: true,
     fill: true,
     posterImage: config.posterImage,
+    progressive: config.progressive,
+    highestBitrate: config.highestBitrate,
   });
 }
 
@@ -442,7 +528,6 @@ async function decorateVideoModal(block, config) {
   const container = document.createElement('div');
   container.classList.add('video-component');
 
-  const posterImage = config.posterImage.cloneNode(true);
   const playButton = document.createElement('button');
   playButton.setAttribute('aria-label', 'Play video');
   playButton.classList.add('video-play-button');
@@ -457,8 +542,12 @@ async function decorateVideoModal(block, config) {
     await openModal(config);
   });
 
-  container.append(posterImage);
   container.append(playButton);
+
+  if (config.posterImage) {
+    const posterImage = config.posterImage.cloneNode(true);
+    container.append(posterImage);
+  }
 
   block.innerHTML = '';
   block.append(container);
@@ -470,23 +559,35 @@ async function decorateVideoModal(block, config) {
 }
 
 export default async function decorate(block) {
-  if (typeof window.DELAYED_PHASE !== 'undefined') {
-    // DELAYED_PHASE is defined, so hook to delayed-phase
-    if (window.DELAYED_PHASE) {
-      loadVideoJs();
-    } else {
-      const delayedPhaseHandler = async () => {
-        document.removeEventListener('delayed-phase', delayedPhaseHandler);
-        await loadVideoJs();
-      };
-      document.addEventListener('delayed-phase', delayedPhaseHandler);
+  // Check for progressive class
+  const isProgressive = block.classList.contains('progressive');
+
+  if (!isProgressive) {
+    let vjsLoadingPhase;
+    if (block.classList.contains('lazy')) {
+      vjsLoadingPhase = 'lazy';
+    } else if (block.classList.contains('delayed')) {
+      vjsLoadingPhase = 'delayed';
     }
-  } else {
-    // DELAYED_PHASE is not defined, so don't hook to delayed-phase event
-    setTimeout(loadVideoJs, 3000);
+
+    if (vjsLoadingPhase) {
+      if (window.LOADING_PHASE === vjsLoadingPhase) {
+        loadVideoJs();
+      } else {
+        const vjsLoadingPhaseHandler = async () => {
+          document.removeEventListener(`${vjsLoadingPhase}-phase`, vjsLoadingPhaseHandler);
+          await loadVideoJs();
+        };
+        document.addEventListener(`${vjsLoadingPhase}-phase`, vjsLoadingPhaseHandler);
+      }
+    } else {
+      await loadVideoJs();
+    }
   }
 
   const config = parseConfig(block);
+  // Add progressive flag to config
+  config.progressive = isProgressive;
 
   if (config.type === 'hero') {
     await decorateHeroBlock(block, config);
