@@ -30,6 +30,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   gap: 24px;
+  margin-left: 35px;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -68,8 +69,6 @@
 }
 
 .videocarousel .videocarousel-slide iframe {
-  width: 530px;
-  height: 300px;
   border: none;
   border-radius: 8px;
 }
@@ -192,6 +191,10 @@
     width: 1rem;
     height: 1rem;
   }
+
+  .videocarousel .videocarousel-slide iframe {
+    width: 530px;
+    height: 300px;
 }
 
 @media (max-width: 600px) {
