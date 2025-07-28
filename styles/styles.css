@@ -196,22 +196,17 @@ main img {
   width: 100%;
 }
 
-/* sections */
-main .section {
-  padding: 64px 16px;
-}
-
-@media (width >= 600px) {
-  main .section {
-    padding: 64px 32px;
-    margin: 0 10%;
-  }
-}
-
-@media (width >= 900px) {
+@media (width >= 768px) {
   .section > div {
     /* max-width: 1200px; */
     margin: auto;
+  }
+
+  main > div > div > h2,
+  main > div > div > h3,
+  main > div > div > p {
+    margin-left: 15%;
+    margin-block-start: 0;
   }
 }
 

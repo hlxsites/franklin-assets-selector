@@ -1,5 +1,13 @@
 import { fetchPlaceholders } from '../../scripts/aem.js';
 
+const INTERVAL_TIME = 10000; // 5 seconds
+// Function to start auto sliding
+
+// Function to stop auto sliding
+function stopAutoSlide(block) {
+  clearInterval(block.autoSlideInterval);
+}
+
 function updateActiveSlide(slide) {
   const block = slide.closest('.carousel');
   const slideIndex = parseInt(slide.dataset.slideIndex, 10);
@@ -18,12 +26,15 @@ function updateActiveSlide(slide) {
     });
   });
 
-  const indicators = block.querySelectorAll('.carousel-slide-indicator');
-  indicators.forEach((indicator, idx) => {
-    if (idx !== slideIndex) {
-      indicator.querySelector('button').removeAttribute('disabled');
-    } else {
-      indicator.querySelector('button').setAttribute('disabled', 'true');
+  const indicators = block.querySelectorAll('.carousel-slide-indicator button');
+  indicators.forEach((indicatorButton, idx) => {
+    // Ensure all indicators stop their filling animation
+    indicatorButton.classList.remove('filling');
+    // eslint-disable-next-line
+    indicatorButton.offsetWidth; // Trigger reflow to restart the CSS animation
+    // Apply filling class to the correct indicator
+    if (idx === slideIndex) {
+      indicatorButton.classList.add('filling');
     }
   });
 }
@@ -40,6 +51,16 @@ function showSlide(block, slideIndex = 0) {
     left: activeSlide.offsetLeft,
     behavior: 'smooth',
   });
+
+  // Update active slide and indicators
+  updateActiveSlide(activeSlide);
+}
+
+function startAutoSlide(block) {
+  const intervalTime = INTERVAL_TIME;
+  block.autoSlideInterval = setInterval(() => {
+    showSlide(block, parseInt(block.dataset.activeSlide, 10) + 1);
+  }, intervalTime);
 }
 
 function bindEvents(block) {
@@ -50,14 +71,21 @@ function bindEvents(block) {
     button.addEventListener('click', (e) => {
       const slideIndicator = e.currentTarget.parentElement;
       showSlide(block, parseInt(slideIndicator.dataset.targetSlide, 10));
+      stopAutoSlide(); // Stop auto slide when manually navigating
+      startAutoSlide(); // Restart auto slide
     });
   });
 
   block.querySelector('.slide-prev').addEventListener('click', () => {
     showSlide(block, parseInt(block.dataset.activeSlide, 10) - 1);
+    stopAutoSlide();
+    startAutoSlide();
   });
+
   block.querySelector('.slide-next').addEventListener('click', () => {
     showSlide(block, parseInt(block.dataset.activeSlide, 10) + 1);
+    stopAutoSlide();
+    startAutoSlide();
   });
 
   const slideObserver = new IntersectionObserver((entries) => {
@@ -120,7 +148,7 @@ export default async function decorate(block) {
     const slideNavButtons = document.createElement('div');
     slideNavButtons.classList.add('carousel-navigation-buttons');
     slideNavButtons.innerHTML = `
-      <button type="button" class= "slide-prev" aria-label="${placeholders.previousSlide || 'Previous Slide'}"></button>
+      <button type="button" class="slide-prev" aria-label="${placeholders.previousSlide || 'Previous Slide'}"></button>
       <button type="button" class="slide-next" aria-label="${placeholders.nextSlide || 'Next Slide'}"></button>
     `;
 
@@ -146,5 +174,6 @@ export default async function decorate(block) {
 
   if (!isSingleSlide) {
     bindEvents(block);
+    startAutoSlide(block); // Start auto slide when the carousel is decorated
   }
 }

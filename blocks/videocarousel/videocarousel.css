@@ -1,0 +1,218 @@
+.videocarousel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+}
+
+.videocarousel-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.videocarousel .videocarousel-slides-container {
+  position: relative;
+  overflow: visible;
+}
+
+.videocarousel .videocarousel-slides,
+.videocarousel .videocarousel-slide-indicators {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.videocarousel .videocarousel-slides {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 24px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.videocarousel .videocarousel-slides::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.videocarousel .videocarousel-slide {
+  position: relative;
+  min-width: calc(50% - 12px);
+  height: 100%;
+  opacity: 1;
+  z-index: 0;
+  visibility: visible;
+  display: flex;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.videocarousel .videocarousel-slide a {
+  flex: 1;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.videocarousel .videocarousel-slide a:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+.videocarousel .videocarousel-slide iframe {
+  width: 530px;
+  height: 300px;
+  border: none;
+  border-radius: 8px;
+}
+
+.videocarousel .videocarousel-slide-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.videocarousel .videocarousel-slide-indicator button {
+  width: 0.75rem;
+  height: 0.75rem;
+  padding: 0;
+  border-radius: 50%;
+  background-color: rgb(0 0 0 / 25%);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.videocarousel .videocarousel-slide-indicator button:hover,
+.videocarousel .videocarousel-slide-indicator button:focus-visible {
+  background-color: rgb(0 0 0 / 80%);
+}
+
+.videocarousel .videocarousel-slide-indicator button[aria-current="true"] {
+  background-color: rgb(0 0 0 / 80%);
+}
+
+.videocarousel .videocarousel-slide-indicator span,
+.videocarousel .videocarousel-navigation-buttons span {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
+}
+
+.videocarousel .videocarousel-navigation-buttons {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0.5rem;
+  right: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+  height: 3rem;
+}
+
+.videocarousel .videocarousel-navigation-buttons button {
+  display: block;
+  border-radius: 50%;
+  margin: 0;
+  padding: 0;
+  width: 3rem;
+  height: 3rem;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 11;
+}
+
+.videocarousel .videocarousel-navigation-buttons button:hover,
+.videocarousel .videocarousel-navigation-buttons button:focus-visible {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.videocarousel .videocarousel-navigation-buttons button::after {
+  display: block;
+  content: "";
+  border: 3px #333 solid;
+  border-bottom: 0;
+  border-left: 0;
+  height: 0.75rem;
+  width: 0.75rem;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 3px);
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.videocarousel .videocarousel-navigation-buttons button.slide-next::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+  left: calc(50% - 3px);
+}
+
+@media (width >= 900px) {
+  .videocarousel,
+  .videocarousel-wrapper{
+    padding: 0;
+  }
+
+  .videocarousel .videocarousel-navigation-buttons {
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .videocarousel .videocarousel-navigation-buttons button {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .videocarousel .videocarousel-navigation-buttons button::after {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .videocarousel,
+  .videocarousel-wrapper,
+  .videocarousel-container {
+    padding: 0 1rem;
+  }
+  
+  .videocarousel .videocarousel-slides {
+    height: 300px;
+    gap: 16px;
+  }
+  
+  .videocarousel .videocarousel-slide {
+    min-width: 100%;
+    gap: 16px;
+  }
+  
+  .videocarousel .videocarousel-navigation-buttons button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+} 
