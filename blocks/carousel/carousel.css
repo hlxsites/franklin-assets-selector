@@ -57,10 +57,18 @@
 .carousel .carousel-slide .carousel-slide-content {
   z-index: 1;
   padding: 1rem;
-  margin: 1.5rem 3rem;
+  margin: 0;
   color: white;
-  position: relative;
-  width: var(--slide-content-width, auto);
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 80%;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .carousel .carousel-slide-indicators {
@@ -68,7 +76,7 @@
   justify-content: center;
   gap: 0.5rem;
   position: relative;
-  top: -100px;
+  top: -120px;
 }
 
 .carousel .carousel-slide-indicator button {
@@ -188,16 +196,20 @@
   }
 
   .carousel .carousel-slide .carousel-slide-content {
-    --slide-content-width: 50%;
-    
-    margin: 2.5rem 5rem;
-    height: 400px;
+    bottom: 5px;
+    font-size: 1.5rem;
+    max-width: 60%;
   }
 
   .carousel .carousel-slide .carousel-slide-content[data-align="justify"] {
     --slide-content-width: auto;
   }
+
+  .carousel .carousel-slide-indicators {
+    top: -50px;
+  }
 }
+
 
 @media only screen and (width < 600px) {
   .carousel .carousel-slide {
@@ -207,5 +219,9 @@
   .carousel .carousel-slide .carousel-slide-image picture {
     position: relative;
     display: block;
+  }
+  
+  .carousel .carousel-slide .carousel-slide-content {
+    display:none;
   }
 }
