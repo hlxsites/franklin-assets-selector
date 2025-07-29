@@ -14,6 +14,9 @@
   height: 200px;
   object-fit: cover;
   border-radius: 8px;
+  /* Optimize image rendering */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 .columns > div > div {
@@ -27,6 +30,13 @@
 
 .columns > div > .columns-img-col img {
   display: block;
+}
+
+/* Optimize LCP image */
+.columns > div > .columns-img-col:first-child img {
+  /* Ensure LCP image loads with high priority */
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
 }
 
 /* Add icons before em elements */

@@ -1,0 +1,177 @@
+.gridcard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  background: #f5f5dc;
+  display: flex;
+  min-height: 500px;
+}
+
+.gridcard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.gridcard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.gridcard .gridcard-grid {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.gridcard .gridcard-item {
+  flex: 1;
+  height: 500px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+/* First item - Light beige background with text */
+.gridcard .gridcard-item:first-child {
+  background: #f5f5dc;
+  justify-content: center;
+}
+
+.gridcard .gridcard-item:first-child .gridcard-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2c2c2c;
+  margin: 0 0 1rem 0;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.gridcard .gridcard-item:first-child .gridcard-title::before {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: #333;
+  margin: 0 auto 1rem auto;
+}
+
+.gridcard .gridcard-item:first-child .gridcard-description {
+  font-size: 1.2rem;
+  color: #666;
+  margin: 0 0 2rem 0;
+  font-weight: 500;
+}
+
+.gridcard .gridcard-item:first-child .gridcard-cta {
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+/* Second item - Dark green background (Dhaniya) */
+.gridcard .gridcard-item:nth-child(2) {
+  background: #2c5530;
+  justify-content: space-between;
+}
+
+/* Third item - Dark gray background (Black Pepper) */
+.gridcard .gridcard-item:nth-child(3) {
+  background: #2a2a2a;
+  justify-content: space-between;
+}
+
+/* Fourth item - Dark red/brown background (Turmeric) */
+.gridcard .gridcard-item:nth-child(4) {
+  background: #8b4513;
+  justify-content: space-between;
+}
+
+/* Spice card styling (items 2-4) */
+.gridcard .gridcard-item:not(:first-child) .gridcard-image {
+  max-width: 200px;
+  height: 150px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridcard .gridcard-item:not(:first-child) .gridcard-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.gridcard .gridcard-item:not(:first-child) .gridcard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.gridcard .gridcard-item:not(:first-child) .gridcard-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+  flex: 1;
+}
+
+.gridcard .gridcard-item:not(:first-child) .gridcard-cta {
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .gridcard {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .gridcard .gridcard-grid {
+    flex-direction: column;
+  }
+  
+  .gridcard .gridcard-item {
+    height: auto;
+    min-height: 300px;
+    padding: 2rem 1rem;
+  }
+  
+  .gridcard .gridcard-item:first-child .gridcard-title {
+    font-size: 2.5rem;
+  }
+  
+  .gridcard .gridcard-item:not(:first-child) .gridcard-image {
+    max-width: 150px;
+    height: 120px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .gridcard .gridcard-item:first-child .gridcard-title {
+    font-size: 2.5rem;
+  }
+  
+  .gridcard .gridcard-item:not(:first-child) .gridcard-image {
+    max-width: 180px;
+    height: 130px;
+  }
+} 
