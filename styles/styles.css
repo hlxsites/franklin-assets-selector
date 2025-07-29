@@ -79,7 +79,8 @@ header {
 }
 
 main {
-  background-image: url('../resources/summit/splash-screen-img.jpg');
+  /*background-image: url('../resources/summit/splash-screen-img.jpg');*/
+  background-color: #edece3;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
