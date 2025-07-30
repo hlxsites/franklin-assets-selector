@@ -1,0 +1,162 @@
+.bgcard {
+  display: flex;
+  min-height: 35vh;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.bgcard .bgcard-content {
+  flex: 1;
+  padding: 2rem 2rem 2rem 16rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.bgcard .bgcard-image {
+  flex: 0 0 30%;
+  position: relative;
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.bgcard .bgcard-header {
+  margin-bottom: 2rem;
+}
+
+.bgcard .bgcard-title {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.bgcard .bgcard-title::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background-color: white;
+}
+
+.bgcard .bgcard-subtitle {
+  color: white;
+  margin: 0.5rem 0 0 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.bgcard .bgcard-progress {
+  color: white;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.bgcard .bgcard-question {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 2rem 0;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+}
+
+.bgcard .bgcard-options {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.bgcard .bgcard-option {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid white;
+  border-radius: 25px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  min-width: 120px;
+}
+
+.bgcard .bgcard-option:hover,
+.bgcard .bgcard-option.selected {
+  background-color: rgb(235, 169, 169);
+  color: inherit;
+}
+
+.bgcard .bgcard-navigation {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.bgcard .bgcard-next {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border: 2px solid white;
+  border-radius: 25px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bgcard .bgcard-next:hover {
+  background-color: rgb(235, 169, 169);
+  color: inherit;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .bgcard {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .bgcard .bgcard-image {
+    flex: 0 0 200px;
+    background-position: center;
+  }
+  
+  .bgcard .bgcard-content {
+    padding: 1.5rem;
+  }
+  
+  .bgcard .bgcard-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .bgcard .bgcard-option {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .bgcard .bgcard-question {
+    font-size: 1.4rem;
+    margin: 1.5rem 0;
+  }
+  
+  .bgcard .bgcard-subtitle {
+    font-size: 2rem;
+  }
+} 

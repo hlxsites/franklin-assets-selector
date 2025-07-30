@@ -13,3 +13,7 @@ footer .footer p {
   margin: 0;
   color: white;
 }
+
+footer .footer a:any-link {
+  color:white;
+}
