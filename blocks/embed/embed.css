@@ -66,10 +66,10 @@ main .embed {
 
   main .embed .embed-default {
     position: relative;
-    left: 0;
-    width: 100%; 
+    left: 15%;
+    width: 70%; 
     height: 0; 
-    padding-bottom: 56.25%;
+    padding-bottom: 36.25%;
   }
 
   @media only screen and (max-width: 1024px) and (orientation: portrait) {

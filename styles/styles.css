@@ -186,6 +186,10 @@ main img {
   height: auto;
 }
 
+main .wideimage > div > div > picture > img {
+  width: -webkit-fill-available;
+}
+
 .icon {
   display: inline-block;
   height: 24px;
