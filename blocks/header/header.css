@@ -251,6 +251,7 @@ header nav .nav-sections ul > li > ul > li {
     flex: 0 1 auto;
     position: relative;
     font-weight: 400;
+    font-size: 18px;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul {
