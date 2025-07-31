@@ -18,6 +18,26 @@
 
 .columns > div > div {
   order: 1;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+}
+
+.columns > div > div:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.columns > div > div > p {
+  margin-top: 0;
+  maring-bottom: 0;
+}
+
+.columns > div > div p:nth-child(2) {
+  margin-left: 10px;
 }
 
 .columns > div > .columns-img-col {

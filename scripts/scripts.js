@@ -332,6 +332,8 @@ loadPage();
 function colorizeBracketedText(root = document.body) {
   // Regex: [text{color}]
   const regex = /\[([^\{\]]+)\{([^\}\]]+)\}\]/g;
+  // Regex: {spacer}
+  const spacerRegex = /\{spacer\}/g;
 
   // Elements to scan
   const selectors = 'h1, h2, h3, h4, h5, h6, p, span, li, td, th, a, div';
@@ -339,17 +341,28 @@ function colorizeBracketedText(root = document.body) {
   root.querySelectorAll(selectors).forEach(el => {
     // Only process elements with childNodes (not just textContent)
     el.childNodes.forEach(node => {
-      if (node.nodeType === Node.TEXT_NODE && regex.test(node.textContent)) {
-        // Reset regex lastIndex for global regex
-        regex.lastIndex = 0;
-        // Replace all matches in the text node
-        const replaced = node.textContent.replace(regex, (match, text, color) => {
-          return `<span style="color:${color}">${text}</span>`;
-        });
-        // Replace the text node with HTML
-        const span = document.createElement('span');
-        span.innerHTML = replaced;
-        el.replaceChild(span, node);
+      if (node.nodeType === Node.TEXT_NODE) {
+        let replaced = node.textContent;
+        
+        // Replace {spacer} with solid black line
+        if (spacerRegex.test(replaced)) {
+          replaced = replaced.replace(spacerRegex, '<div style="width: 2%; height: 4px; background-color: black; margin: 10px 0;"></div>');
+        }
+        
+        // Replace [text{color}] with colored spans
+        if (regex.test(replaced)) {
+          regex.lastIndex = 0; // Reset regex lastIndex for global regex
+          replaced = replaced.replace(regex, (match, text, color) => {
+            return `<span style="color:${color}">${text}</span>`;
+          });
+        }
+        
+        // Only replace if content changed
+        if (replaced !== node.textContent) {
+          const span = document.createElement('span');
+          span.innerHTML = replaced;
+          el.replaceChild(span, node);
+        }
       }
     });
   });

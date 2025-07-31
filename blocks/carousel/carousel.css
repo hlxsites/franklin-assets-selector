@@ -71,6 +71,14 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
+.carousel .carousel-slide .carousel-slide-content h3{
+  font-size: 38px;
+}
+
+.carousel .carousel-slide .carousel-slide-content p{
+  font-size: 22px;
+}
+
 .carousel .carousel-slide-indicators {
   display: flex;
   justify-content: center;

@@ -148,6 +148,7 @@ a:hover {
   color: var(--link-hover-color);
 }
 
+
 /* buttons */
 a.button:any-link, button {
   font-family: var(--body-font-family);
@@ -226,4 +227,112 @@ h6 { font-size: var(--heading-font-size-xs) }
 main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
+}
+
+/* Recipe Card Image Borders */
+
+/* Second paragraph in columns block */
+.columns > div > div p:nth-child(2) {
+  margin-left: 10px;
+}
+
+/* Option 1: Subtle rounded border with shadow */
+.recipe-card img {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.recipe-card img:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Option 2: Clean white border */
+.recipe-card img {
+  border: 3px solid white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Option 3: Colored border based on category */
+.recipe-card.category-savoury img {
+  border: 3px solid #8B4513; /* Brown for Savoury */
+}
+
+.recipe-card.category-hot img {
+  border: 3px solid #FF4500; /* Orange-red for Hot */
+}
+
+.recipe-card.category-crispy img {
+  border: 3px solid #FFD700; /* Gold for Crispy */
+}
+
+/* Option 4: Gradient border */
+.recipe-card img {
+  border: 3px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(45deg, #FF6B6B, #4ECDC4) border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Option 5: Minimal border with focus state */
+.recipe-card img {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.recipe-card img:focus,
+.recipe-card img:hover {
+  border-color: #333;
+  outline: none;
+}
+
+/* Option 6: Thick border with category colors */
+.recipe-card img {
+  border: 4px solid;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+.recipe-card[data-category="savoury"] img {
+  border-color: #8B4513;
+}
+
+.recipe-card[data-category="hot"] img {
+  border-color: #FF4500;
+}
+
+.recipe-card[data-category="crispy"] img {
+  border-color: #FFD700;
+}
+
+/* Option 7: Elegant border with inner shadow */
+.recipe-card img {
+  border: 2px solid #f8f8f8;
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Option 8: Modern card-style border */
+.recipe-card img {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recipe-card img:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 12px 24px rgba(0, 0, 0, 0.15);
 }
