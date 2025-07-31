@@ -36,8 +36,13 @@
   maring-bottom: 0;
 }
 
-.columns > div > div p:nth-child(2) {
+.columns > div > div p:nth-child(3) {
   margin-left: 10px;
+}
+
+.columns > div > div > h5 {
+  margin-left: 10px;
+  font-size: 20px;
 }
 
 .columns > div > .columns-img-col {
@@ -73,7 +78,8 @@
 
 .columns > div > div > p > em {
   font-size: 14px;
-  font-weight: 300;;
+  font-weight: 300;
+  font-style: normal;
 }
 .columns-container >div > p > em {
   color: #717171;
