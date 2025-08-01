@@ -81,6 +81,17 @@
   font-weight: 300;
   font-style: normal;
 }
+
+.columns.spices > div > div > h3 {
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+.columns.spices > div > div > p {
+  font-size: 14px;
+  color: #717171 !important;
+}
+
 .columns-container >div > p > em {
   color: #717171;
     font-style: normal;
