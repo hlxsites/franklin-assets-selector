@@ -85,6 +85,7 @@
 .columns.spices > div > div > h3 {
   font-size: 20px;
   margin-left: 10px;
+  
 }
 
 .columns.spices > div > div > p {
@@ -103,6 +104,12 @@
   font-size: 2.375rem;
   line-height: 2.5rem;
   font-weight: 700;
+}
+
+.columns-container >div > h3 {
+  font-size: 38px;
+  line-height: 2.5rem;
+  font-weight: 300;
 }
 
 @media (width >= 900px) {
