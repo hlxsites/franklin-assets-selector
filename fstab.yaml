@@ -1,2 +1,7 @@
 mountpoints:
-  /: https://adobe.sharepoint.com/:f:/r/sites/HelixProjects/Shared%20Documents/sites/aem-assets
+  /:
+    url: https://content.da.live/{org}/{site}/
+    type: markup
+
+folders:
+  /products/: /products/default
