@@ -81,7 +81,7 @@ function createWebOptimizedDMOpenAPIUrl(url) {
  */
 function getImageSrcUrlAndAlt(element) {
   if (element.tagName === 'A') {
-    return { url: element.getAttribute('href'), alt: '' };
+    return { url: element.getAttribute('href'), alt: element.getAttribute('title') || '' };
   }
 
   if (element.tagName === 'IMG') {

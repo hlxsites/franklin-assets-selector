@@ -128,6 +128,21 @@
           }
         },
         {
+          "title": "Custom Image One",
+          "id": "custom-asset-one",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Custom Image One",
+                  "model": "custom-asset-one"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {
