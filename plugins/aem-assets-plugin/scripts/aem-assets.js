@@ -1,4 +1,11 @@
 /**
+ * All supported image formats
+ * @constant {string[]}
+ * @note Vector formats (svg, ai, eps) don't support smart cropping
+ */
+const IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg'];
+
+/**
  * Gets the extension of a URL.
  * @param {string} url The URL
  * @returns {string} The extension
@@ -30,7 +37,7 @@ function isImageUrl(url) {
   
   const ext = getUrlExtension(url);
 
-  if (ext && ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext.toLowerCase())) return true;
+  if (ext && IMAGE_FORMATS.includes(ext.toLowerCase())) return true;
 
   // Check for '/is/image/' for handling DM image URLs
   if (url.includes('is/image/')) return true;
@@ -38,6 +45,21 @@ function isImageUrl(url) {
   return false;
 }
 
+
+/**
+ * Determines if an image type supports smart cropping
+ * @param {string} url The image URL
+ * @returns {boolean} Whether the image type supports smart cropping
+ * @private
+ */
+function supportsSmartCrop(url) {
+  if (!url) return false;
+  const ext = getUrlExtension(url).toLowerCase();
+  
+  // Smart crops work for raster images but not for vector formats
+  const vectorFormats = ['svg']; // Can be extended: ['svg', 'ai', 'eps']
+  return !vectorFormats.includes(ext) && IMAGE_FORMATS.includes(ext);
+}
 
 /**
  * Converts DM OpenAPI URLs from /original/ format to /as/ format with assetname parameter
@@ -81,7 +103,7 @@ function createWebOptimizedDMOpenAPIUrl(url) {
  */
 function getImageSrcUrlAndAlt(element) {
   if (element.tagName === 'A') {
-    return { url: element.getAttribute('href'), alt: '' };
+    return { url: element.getAttribute('href'), alt: element.getAttribute('title') || '' };
   }
 
   if (element.tagName === 'IMG') {
@@ -256,14 +278,17 @@ export function createOptimizedPictureWithSmartcrop(
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
 
+  // Check if the image type supports smart cropping
+  const canUseSmartCrop = supportsSmartCrop(src);
+
   // initialise breakpoint to project level smartcrop config unless needed to customise
   const smartcropBreakpoints = breakpoints.length !== 0 ? breakpoints
-    : Object.entries(window.hlx.aemassets?.smartCrops).map(
+    : (canUseSmartCrop ? Object.entries(window.hlx.aemassets?.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
         smartcrop: name,
       }),
-    );
+    ) : []);
 
   const url = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const picture = document.createElement('picture');
@@ -275,14 +300,20 @@ export function createOptimizedPictureWithSmartcrop(
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    const searchParams = new URLSearchParams({ smartcrop: br.smartcrop, format: 'webply' });
+    const searchParams = new URLSearchParams({ format: 'webply' });
+    if (canUseSmartCrop && br.smartcrop) {
+      searchParams.set('smartcrop', br.smartcrop);
+    }
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
     picture.appendChild(source);
   });
 
   // fallback for non-webp
   smartcropBreakpoints.forEach((br) => {
-    const searchParams = new URLSearchParams({ smartcrop: br.smartcrop, format: ext });
+    const searchParams = new URLSearchParams({ format: ext });
+    if (canUseSmartCrop && br.smartcrop) {
+      searchParams.set('smartcrop', br.smartcrop);
+    }
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
@@ -372,10 +403,13 @@ export function createOptimizedPictureForDMOpenAPI(
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
   const originalUrl = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const url = createWebOptimizedDMOpenAPIUrl(originalUrl);
-  
+
+  // Check if the image type supports smart cropping
+  const canUseSmartCrop = supportsSmartCrop(src);
+
   // Determine which breakpoints to use
   let finalBreakpoints = breakpoints;
-  if (useSmartcrop && window.hlx?.aemassets?.smartCrops) {
+  if (useSmartcrop && canUseSmartCrop && window.hlx?.aemassets?.smartCrops) {
     finalBreakpoints = Object.entries(window.hlx.aemassets.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
@@ -392,7 +426,7 @@ export function createOptimizedPictureForDMOpenAPI(
     source.setAttribute('type', 'image/avif');
     
     const searchParams = new URLSearchParams({ width: br.width });
-    if (useSmartcrop && br.smartcrop) {
+    if (useSmartcrop && canUseSmartCrop && br.smartcrop) {
       searchParams.set('smartcrop', br.smartcrop);
     }
     
@@ -405,9 +439,9 @@ export function createOptimizedPictureForDMOpenAPI(
     if (i < finalBreakpoints.length - 1) {
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
-      
-      const searchParams = new URLSearchParams({ width: br.width});
-      if (useSmartcrop && br.smartcrop) {
+
+      const searchParams = new URLSearchParams({ width: br.width });
+      if (useSmartcrop && canUseSmartCrop && br.smartcrop) {
         searchParams.set('smartcrop', br.smartcrop);
       }
       
