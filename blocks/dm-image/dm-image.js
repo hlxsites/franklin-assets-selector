@@ -1,5 +1,5 @@
-import { decorateExternalImages } from "../../plugins/aem-assets-plugin/scripts/aem-assets.js";
+import { decorateExternalImages } from 'aem-assets-blocks/scripts/aem-assets.js';
 
 export default function decorate(block) {
-    decorateExternalImages(block);
+  decorateExternalImages(block);
 }
