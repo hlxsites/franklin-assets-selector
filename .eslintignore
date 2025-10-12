@@ -1,2 +1,4 @@
 helix-importer-ui
 plugins/aem-assets-plugin/blocks/video/videojs/*.min.js
+plugins/aem-assets-plugin/package.json
+plugins/aem-assets-plugin/package-lock.json
