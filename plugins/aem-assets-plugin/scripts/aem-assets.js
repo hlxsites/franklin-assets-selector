@@ -1,9 +1,15 @@
 /**
  * All supported image formats
  * @constant {string[]}
- * @note Vector formats (svg, ai, eps) don't support smart cropping
  */
 const IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg'];
+
+/**
+ * Vector/excluded formats that don't support smart cropping
+ * @constant {string[]}
+ * @note Can be extended with other vector formats like 'ai', 'eps', 'pdf'
+ */
+const SMART_CROP_EXCLUDED_FORMATS = ['svg'];
 
 /**
  * Gets the extension of a URL.
@@ -34,7 +40,6 @@ function getUrlExtension(url) {
  */
 function isImageUrl(url) {
   if (!url) return false;
-
   const ext = getUrlExtension(url);
 
   if (ext && IMAGE_FORMATS.includes(ext.toLowerCase())) return true;
@@ -54,10 +59,9 @@ function isImageUrl(url) {
 function supportsSmartCrop(url) {
   if (!url) return false;
   const ext = getUrlExtension(url).toLowerCase();
-
-  // Smart crops work for raster images but not for vector formats
-  const vectorFormats = ['svg']; // Can be extended: ['svg', 'ai', 'eps']
-  return !vectorFormats.includes(ext) && IMAGE_FORMATS.includes(ext);
+  
+  // Smart crops work for raster images but not for excluded vector formats
+  return !SMART_CROP_EXCLUDED_FORMATS.includes(ext) && IMAGE_FORMATS.includes(ext);
 }
 
 /**
@@ -287,23 +291,14 @@ export function createOptimizedPictureWithSmartcrop(
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
 
-  // Check if the image type supports smart cropping
-  const canUseSmartCrop = supportsSmartCrop(src);
-
   // initialise breakpoint to project level smartcrop config unless needed to customise
-  let smartcropBreakpoints;
-  if (breakpoints.length !== 0) {
-    smartcropBreakpoints = breakpoints;
-  } else if (canUseSmartCrop) {
-    smartcropBreakpoints = Object.entries(window.hlx.aemassets?.smartCrops).map(
+  const smartcropBreakpoints = breakpoints.length !== 0 ? breakpoints
+    : Object.entries(window.hlx.aemassets?.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
         smartcrop: name,
       }),
     );
-  } else {
-    smartcropBreakpoints = [];
-  }
 
   const url = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const picture = document.createElement('picture');
@@ -315,20 +310,14 @@ export function createOptimizedPictureWithSmartcrop(
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    const searchParams = new URLSearchParams({ format: 'webply' });
-    if (canUseSmartCrop && br.smartcrop) {
-      searchParams.set('smartcrop', br.smartcrop);
-    }
+    const searchParams = new URLSearchParams({ smartcrop: br.smartcrop, format: 'webply' });
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
     picture.appendChild(source);
   });
 
   // fallback for non-webp
   smartcropBreakpoints.forEach((br) => {
-    const searchParams = new URLSearchParams({ format: ext });
-    if (canUseSmartCrop && br.smartcrop) {
-      searchParams.set('smartcrop', br.smartcrop);
-    }
+    const searchParams = new URLSearchParams({ smartcrop: br.smartcrop, format: ext });
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
@@ -360,10 +349,7 @@ export function createOptimizedPictureForDM(
   src,
   alt = '',
   eager = false,
-  breakpoints = [
-    { media: '(min-width: 600px)', width: '2000' },
-    { width: '750' },
-  ],
+  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
   const picture = document.createElement('picture');
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
@@ -424,12 +410,9 @@ export function createOptimizedPictureForDMOpenAPI(
   const originalUrl = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const url = createWebOptimizedDMOpenAPIUrl(originalUrl);
 
-  // Check if the image type supports smart cropping
-  const canUseSmartCrop = supportsSmartCrop(src);
-
   // Determine which breakpoints to use
   let finalBreakpoints = breakpoints;
-  if (useSmartcrop && canUseSmartCrop && window.hlx?.aemassets?.smartCrops) {
+  if (useSmartcrop && window.hlx?.aemassets?.smartCrops) {
     finalBreakpoints = Object.entries(window.hlx.aemassets.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
@@ -446,7 +429,7 @@ export function createOptimizedPictureForDMOpenAPI(
     source.setAttribute('type', 'image/avif');
 
     const searchParams = new URLSearchParams({ width: br.width });
-    if (useSmartcrop && canUseSmartCrop && br.smartcrop) {
+    if (useSmartcrop && br.smartcrop) {
       searchParams.set('smartcrop', br.smartcrop);
     }
 
@@ -461,7 +444,7 @@ export function createOptimizedPictureForDMOpenAPI(
       if (br.media) source.setAttribute('media', br.media);
 
       const searchParams = new URLSearchParams({ width: br.width });
-      if (useSmartcrop && canUseSmartCrop && br.smartcrop) {
+      if (useSmartcrop && br.smartcrop) {
         searchParams.set('smartcrop', br.smartcrop);
       }
 
