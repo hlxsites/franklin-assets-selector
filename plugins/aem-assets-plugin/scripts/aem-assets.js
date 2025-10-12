@@ -59,7 +59,7 @@ function isImageUrl(url) {
 function supportsSmartCrop(url) {
   if (!url) return false;
   const ext = getUrlExtension(url).toLowerCase();
-  
+
   // Smart crops work for raster images but not for excluded vector formats
   return !SMART_CROP_EXCLUDED_FORMATS.includes(ext) && IMAGE_FORMATS.includes(ext);
 }
