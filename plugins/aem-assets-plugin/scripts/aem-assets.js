@@ -25,7 +25,7 @@ const SMART_CROP_EXCLUDED_FORMATS = ['svg'];
  * // returns ''
  * get_url_extension('https://example.com/foo.jpg#qux');
  * // returns 'jpg'
- * get_url_extension('https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:db6f951a-3865-42cf-ad38-13a33cff9e75/as/candy-dessert-tiered-cake-43305.avif?assetname=candy%20dessert%20tiered%20cake%2043305.jpg');
+ * get_url_extension('https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:db6f951a-3865-42cf-ad38-13a33cff9e75/as/candy.avif?assetname=candy.jpg');
  * // returns 'avif'
  */
 function getUrlExtension(url) {
@@ -65,8 +65,7 @@ function supportsSmartCrop(url) {
 }
 
 /**
- * Converts DM OpenAPI URLs from /original/ format to /as/ format
- * with assetname parameter
+ * Converts DM OpenAPI URLs from /original/ format to /as/ format with assetname parameter
  * @param {URL} url The URL to convert
  * @returns {URL} The converted URL or original URL if not a DM OpenAPI URL
  * @private
@@ -137,8 +136,8 @@ function getImageSrcUrlAndAlt(element) {
 /**
  * Checks if an element is an external image.
  * @param {Element} element The element
- * @returns {Object} Object containing isExternal (boolean)
- * and createOptimizedPictureHandler (function or null)
+ * @returns {Object} Object containing isExternal (boolean) and
+ * createOptimizedPictureHandler (function or null)
  * @private
  */
 function isExternalImage(element) {
@@ -160,19 +159,19 @@ function isExternalImage(element) {
 
   // Iterate through the prefixes to find a match
   if (window.hlx.aemassets?.externalImageUrlPrefixes) {
-    const prefixes = window.hlx.aemassets.externalImageUrlPrefixes;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const prefixItem of prefixes) {
-      // If prefixItem is a tuple [prefix, creatorType]
+    window.hlx.aemassets.externalImageUrlPrefixes.some((prefixItem) => {
+      // If prefixItem is a tuple [prefix, handlerFunction]
       if (Array.isArray(prefixItem) && prefixItem.length === 2) {
         const [prefix, handlerFunction] = prefixItem;
+        // Check if the URL starts with the prefix
         if (url.startsWith(prefix)) {
           isExternalUrl = true;
           createOptimizedPictureHandlerFunction = handlerFunction;
-          break;
+          return true; // stops .some()
         }
       }
-    }
+      return false;
+    });
   }
 
   return {
@@ -233,10 +232,7 @@ export function createOptimizedPicture(
   src,
   alt = '',
   eager = false,
-  breakpoints = [
-    { media: '(min-width: 600px)', width: '2000' },
-    { width: '750' },
-  ],
+  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
   const url = new URL(src);
   const picture = document.createElement('picture');
@@ -400,10 +396,7 @@ export function createOptimizedPictureForDMOpenAPI(
   alt = '',
   useSmartcrop = false,
   eager = false,
-  breakpoints = [
-    { media: '(min-width: 600px)', width: '2000' },
-    { width: '750' },
-  ],
+  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
   const picture = document.createElement('picture');
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
@@ -499,8 +492,7 @@ function hasImageSmartcropMeta() {
 }
 
 /**
- * to mark all the external images with smart crop on the page
- * and set data-smartcrop-status=loading
+ * to mark all the external images with smart crop on the page and set data-smartcrop-status=loading
  * if the image is a DM OpenAPI URL
  * @param {Element} ele The element to search within. Defaults to document.
  * @private
@@ -524,8 +516,8 @@ function markSmartCropImages(ele = document) {
       }
     });
   } else {
-    // if not enabled at page level, collect all <a> tags
-    // and standalone <img> tags within block and section elements
+    // if not enabled at page level, collect all <a> tags and standalone <img> tags
+    // within block and section elements
     extImages.push(...ele.querySelectorAll('.smartcrop a'));
     // Add img tags that are not inside picture elements
     ele.querySelectorAll('.smartcrop img').forEach((img) => {
@@ -578,7 +570,8 @@ export function decorateExternalImages(ele) {
       if (!extImageSrc) return; // Skip if no source found
 
       // Use the provided picture creator function to create the picture element
-      const useSmartcrop = renderSmartCrop === 'loading';
+      // Only enable smart crop if marked AND format supports it
+      const useSmartcrop = renderSmartCrop === 'loading' && supportsSmartCrop(extImageSrc);
       const extPicture = createOptimizedPictureHandler(extImageSrc, alt, useSmartcrop);
 
       /* copy query params from link to img */
