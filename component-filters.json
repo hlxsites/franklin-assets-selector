@@ -17,7 +17,9 @@
       "hero",
       "cards",
       "columns",
-      "fragment"    ]
+      "fragment",
+      "custom-asset-one"
+    ]
   },
   {
     "id": "cards",

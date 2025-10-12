@@ -232,5 +232,28 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "custom-asset-one",
+    "fields": [
+      {
+        "component": "custom-asset-namespace:custom-asset",
+        "name": "image",
+        "label": "Image",
+        "configUrl": "/content/dam/Gazal-ue-site/config.json",
+        "valueType": "string"
+      },
+      {
+        "component": "custom-asset-namespace:custom-asset-mimetype",
+        "valueType": "string",
+        "name": "imageMimeType"
+      },
+      {
+        "component": "text",
+        "name": "imageTitle",
+        "label": "Alt Text",
+        "valueType": "string"
+      }
+    ]
   }
 ]
