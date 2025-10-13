@@ -286,16 +286,18 @@ export function createOptimizedPictureWithSmartcrop(
   breakpoints = [],
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
- // check if the image type supports smart cropping
- const canUseSmartCrop = supportsSmartCrop(src);
+  // check if the image type supports smart cropping
+  const canUseSmartCrop = supportsSmartCrop(src);
   // initialise breakpoint to project level smartcrop config unless needed to customise
-  const smartcropBreakpoints = breakpoints.length !== 0 ? breakpoints
-    : (canUseSmartCrop ? Object.entries(window.hlx.aemassets?.smartCrops).map(
+  let smartcropBreakpoints = breakpoints;
+  if (breakpoints.length === 0) {
+    smartcropBreakpoints = canUseSmartCrop ? Object.entries(window.hlx.aemassets?.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
         smartcrop: name,
       }),
-    ) : []);
+    ) : [];
+  }
 
   const url = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
   const picture = document.createElement('picture');
@@ -310,7 +312,7 @@ export function createOptimizedPictureWithSmartcrop(
     const searchParams = new URLSearchParams({ format: 'webply' });
     if (br.smartcrop) {
       searchParams.set('smartcrop', br.smartcrop);
-    }    
+    }
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
     picture.appendChild(source);
   });
