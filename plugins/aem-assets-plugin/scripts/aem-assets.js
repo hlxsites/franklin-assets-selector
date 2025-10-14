@@ -286,13 +286,13 @@ export function createOptimizedPictureWithSmartcrop(
   breakpoints = [],
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
-  
+
   // Check if the image type supports smart cropping
   const canUseSmartCrop = supportsSmartCrop(src);
-  
+
   // Determine which breakpoints to use
   let smartcropBreakpoints = breakpoints;
-  if (canUseSmartCrop  && breakpoints.length === 0 && window.hlx?.aemassets?.smartCrops) {
+  if (canUseSmartCrop && breakpoints.length === 0 && window.hlx?.aemassets?.smartCrops) {
     smartcropBreakpoints = Object.entries(window.hlx.aemassets.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
