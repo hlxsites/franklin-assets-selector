@@ -34,5 +34,5 @@ export default async function assetsInit() {
       // Add more prefixes as needed
       // ['https://another-prefix-', handlerFunction],
     ],
-  }
+  };
 }
