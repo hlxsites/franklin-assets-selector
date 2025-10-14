@@ -5,11 +5,11 @@ const blocks = ['video'];
 
 // Initialize the aem-assets-plugin.
 export default async function assetsInit() {
+  console.log('🚀 assetsInit: Starting initialization...');
   const {
     loadBlock,
     createOptimizedPicture,
     createOptimizedPictureWithSmartcrop,
-    // createOptimizedPictureForDMOpenAPI,
     decorateExternalImages,
     decorateImagesFromAlt,
   } = await import(`${codeBasePath}/scripts/aem-assets.js`);
@@ -30,9 +30,8 @@ export default async function assetsInit() {
     externalImageUrlPrefixes: [
       // Example: DM OpenAPI URLs with smartcrop
       ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureWithSmartcrop],
-      // ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureForDMOpenAPI],
-      // Add more prefixes as needed
-      // ['https://another-prefix-', handlerFunction],
     ],
   };
+  console.log('✅ assetsInit: Configured externalImageUrlPrefixes:', window.hlx.aemassets.externalImageUrlPrefixes);
+  console.log('✅ assetsInit: Handler function name:', createOptimizedPictureWithSmartcrop.name);
 }
