@@ -584,7 +584,7 @@ export function decorateExternalImages(ele) {
 
       // Use the provided picture creator function to create the picture element
       const useSmartcrop = renderSmartCrop === 'loading';
-      const extPicture = createOptimizedPictureWithSmartcrop(extImageSrc, alt);
+      const extPicture = createOptimizedPictureHandler(extImageSrc, alt, useSmartcrop);
 
       /* copy query params from link to img */
       const extImageUrl = new URL(extImageSrc);
