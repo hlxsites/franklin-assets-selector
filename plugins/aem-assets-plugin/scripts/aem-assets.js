@@ -286,17 +286,22 @@ export function createOptimizedPictureWithSmartcrop(
   breakpoints = [],
 ) {
   const isAbsoluteUrl = /^https?:\/\//i.test(src);
-  // check if the image type supports smart cropping
+  
+  // Check if the image type supports smart cropping
   const canUseSmartCrop = supportsSmartCrop(src);
-  // initialise breakpoint to project level smartcrop config unless needed to customise
+  
+  // Determine which breakpoints to use
   let smartcropBreakpoints = breakpoints;
-  if (breakpoints.length === 0) {
-    smartcropBreakpoints = canUseSmartCrop ? Object.entries(window.hlx.aemassets?.smartCrops).map(
+  if (canUseSmartCrop  && breakpoints.length === 0 && window.hlx?.aemassets?.smartCrops) {
+    smartcropBreakpoints = Object.entries(window.hlx.aemassets.smartCrops).map(
       ([name, { minWidth, maxWidth }]) => ({
         media: `(min-width: ${minWidth}px) and (max-width: ${maxWidth}px)`,
         smartcrop: name,
       }),
-    ) : [];
+    );
+  } else if (breakpoints.length === 0) {
+    // No custom breakpoints and format doesn't support smart crop (e.g., SVG)
+    smartcropBreakpoints = [];
   }
 
   const url = isAbsoluteUrl ? new URL(src) : new URL(src, window.location.href);
@@ -309,10 +314,7 @@ export function createOptimizedPictureWithSmartcrop(
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    const searchParams = new URLSearchParams({ format: 'webply' });
-    if (br.smartcrop) {
-      searchParams.set('smartcrop', br.smartcrop);
-    }
+    const searchParams = new URLSearchParams({ smartcrop: br.smartcrop, format: 'webply' });
     source.setAttribute('srcset', appendQueryParams(url, searchParams));
     picture.appendChild(source);
   });
@@ -582,7 +584,7 @@ export function decorateExternalImages(ele) {
 
       // Use the provided picture creator function to create the picture element
       const useSmartcrop = renderSmartCrop === 'loading';
-      const extPicture = createOptimizedPictureHandler(extImageSrc, alt, useSmartcrop);
+      const extPicture = createOptimizedPictureWithSmartcrop(extImageSrc, alt);
 
       /* copy query params from link to img */
       const extImageUrl = new URL(extImageSrc);
