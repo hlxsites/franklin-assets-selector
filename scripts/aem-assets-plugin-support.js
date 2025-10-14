@@ -30,12 +30,12 @@ export default async function assetsInit() {
       Large: { minWidth: 1024, maxWidth: 9999 },
     },
     // Configure external image URL prefixes with their handlers
-    externalImageUrlPrefixes: [
-      // Example: DM OpenAPI URLs with smartcrop
-      ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureWithSmartcrop],
-      // ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureForDMOpenAPI],
-      // Add more prefixes as needed
-      // ['https://another-prefix-', handlerFunction],
-    ],
-  };
+    // externalImageUrlPrefixes: [
+    //   // Example: DM OpenAPI URLs with smartcrop
+    //   ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureWithSmartcrop],
+    //   // ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureForDMOpenAPI],
+    //   // Add more prefixes as needed
+    //   // ['https://another-prefix-', handlerFunction],
+    // ],
+  }
 }
