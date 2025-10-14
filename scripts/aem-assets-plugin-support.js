@@ -32,8 +32,8 @@ export default async function assetsInit() {
     // Configure external image URL prefixes with their handlers
     externalImageUrlPrefixes: [
       // Example: DM OpenAPI URLs with smartcrop
-      // ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureWithSmartcrop],
-      ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureForDMOpenAPI],
+      ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureWithSmartcrop],
+      // ['https://delivery-p66302-e574366.adobeaemcloud.com', createOptimizedPictureForDMOpenAPI],
     ],
   };
   console.log('✅ assetsInit: Configured externalImageUrlPrefixes:', window.hlx.aemassets.externalImageUrlPrefixes);
