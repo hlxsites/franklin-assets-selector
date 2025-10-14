@@ -159,12 +159,16 @@ function isExternalImage(element) {
 
   // Iterate through the prefixes to find a match
   if (window.hlx.aemassets?.externalImageUrlPrefixes) {
+    console.log('Checking URL:', url);
+    console.log('Available prefixes:', window.hlx.aemassets.externalImageUrlPrefixes);
     window.hlx.aemassets.externalImageUrlPrefixes.some((prefixItem) => {
       // If prefixItem is a tuple [prefix, handlerFunction]
       if (Array.isArray(prefixItem) && prefixItem.length === 2) {
         const [prefix, handlerFunction] = prefixItem;
+        console.log('Testing prefix:', prefix, 'against URL:', url);
         // Check if the URL starts with the prefix
         if (url.startsWith(prefix)) {
+          console.log('✅ MATCH! Using handler:', handlerFunction.name);
           isExternalUrl = true;
           createOptimizedPictureHandlerFunction = handlerFunction;
           return true; // stops .some()
@@ -172,6 +176,8 @@ function isExternalImage(element) {
       }
       return false;
     });
+  } else {
+    console.log('⚠️ externalImageUrlPrefixes not configured!');
   }
 
   return {
@@ -584,6 +590,7 @@ export function decorateExternalImages(ele) {
 
       // Use the provided picture creator function to create the picture element
       const useSmartcrop = renderSmartCrop === 'loading';
+      console.log('🎨 Calling handler:', createOptimizedPictureHandler.name, 'with useSmartcrop:', useSmartcrop);
       const extPicture = createOptimizedPictureHandler(extImageSrc, alt, useSmartcrop);
 
       /* copy query params from link to img */
