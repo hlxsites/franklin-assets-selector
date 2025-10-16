@@ -226,10 +226,10 @@ function decorateExternalImages(ele, deliveryMarker) {
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
   // decorate external images with explicit external image marker
-  decorateExternalImages(main, '//External Image//');
+  // decorateExternalImages(main, '//External Image//');
 
   // decorate external images with implicit external image marker
-  decorateExternalImages(main);
+  // decorateExternalImages(main);
 
   // hopefully forward compatible button decoration
   decorateButtons(main);
