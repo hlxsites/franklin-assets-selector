@@ -88,7 +88,6 @@ https://s7ap1.scene7.com/is/image/varuncloudready/
 ```
 Site name: franklin-assets-selector
 Organization name: hlxsites
-Branch: ue
 
 Image Delivery URL prefixes: 
   - https://delivery-p66302-e574366.adobeaemcloud.com/
@@ -710,11 +709,7 @@ console.log('Pictures on page:', document.querySelectorAll('picture').length);
    ✅ These match (same prefix)
    ```
 
-4. **Verify branch configuration**
-   - Ensure request included correct branch name (e.g., "ue")
-   - Feature enablement is branch-specific
-
-5. **Clear cache and test**
+4. **Clear cache and test**
    - Clear browser cache
    - Hard refresh (Ctrl/Cmd + Shift + R)
    - Test in incognito/private window
