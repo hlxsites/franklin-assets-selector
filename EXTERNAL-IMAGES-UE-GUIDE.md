@@ -137,11 +137,20 @@ When the page loads in the browser, the AEM Assets Plugin automatically decorate
 ```html
 <!-- What gets rendered in the browser DOM: -->
 <picture>
+  <!-- AVIF source for desktop/large viewports -->
   <source media="(min-width: 600px)" 
           type="image/avif" 
           srcset="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/hero-image.avif?width=2000">
+  
+  <!-- AVIF source for mobile/default viewports -->
   <source type="image/avif" 
           srcset="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/hero-image.avif?width=750">
+  
+  <!-- Fallback source for first breakpoint (browsers without AVIF support) -->
+  <source media="(min-width: 600px)" 
+          srcset="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/hero-image.avif?width=2000">
+  
+  <!-- Final img element (fallback for all) -->
   <img src="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/hero-image.avif?width=750" 
        alt="My Hero Image" 
        loading="lazy">
