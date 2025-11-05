@@ -378,6 +378,8 @@ This page demonstrates:
              srcset="https://delivery-p66302-e574366.adobeaemcloud.com/...?width=2000">
      <source type="image/avif" 
              srcset="https://delivery-p66302-e574366.adobeaemcloud.com/...?width=750">
+     <source media="(min-width: 600px)" 
+             srcset="https://delivery-p66302-e574366.adobeaemcloud.com/...?width=2000">
      <img src="https://delivery-p66302-e574366.adobeaemcloud.com/...?width=750" 
           alt="My Image" 
           loading="lazy">
