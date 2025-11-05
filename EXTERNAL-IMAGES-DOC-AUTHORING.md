@@ -333,6 +333,7 @@ On this page, you'll see:
    <picture>
      <source media="(min-width: 600px)" type="image/avif" srcset="...?width=2000">
      <source type="image/avif" srcset="...?width=750">
+     <source media="(min-width: 600px)" srcset="...?width=2000">
      <img src="...?width=750" alt="" loading="lazy">
    </picture>
    ```
