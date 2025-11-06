@@ -360,30 +360,6 @@ On this page, you'll see:
 - [ ] **Query Parameters**: Image URLs include query parameters like `?width=750`
 - [ ] **No Broken Images**: All images display correctly
 
-### 🔧 Browser DevTools Testing
-
-**Check configuration:**
-```javascript
-// In browser console:
-console.log(window.hlx.aemassets);
-// Should show: externalImageUrlPrefixes, decorateExternalImages, etc.
-
-// Test if a URL would match:
-const testUrl = 'https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:123/as/test.avif';
-const matches = window.hlx.aemassets.externalImageUrlPrefixes.some(([prefix]) => testUrl.startsWith(prefix));
-console.log('URL matches:', matches);
-
-// Count decorated pictures:
-console.log('Pictures on page:', document.querySelectorAll('picture').length);
-
-// Find remaining anchor tags to images (should be 0 if working):
-const imageAnchors = Array.from(document.querySelectorAll('a')).filter(a => {
-  const href = a.getAttribute('href');
-  return href && /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(href);
-});
-console.log('Undecorated image anchors:', imageAnchors.length);
-```
-
 ---
 
 ## How It Works Under the Hood
@@ -420,31 +396,6 @@ The AEM Assets Plugin's `decorateExternalImages()` function works differently fo
     - Width parameters
     ↓
 12. Replaces <a> tag with <picture> in DOM
-```
-
-### 🎯 Image URL Detection
-
-The plugin uses `isImageUrl()` function to validate image URLs:
-
-```javascript
-// Checks for:
-// 1. Image extensions: jpg, jpeg, png, gif, webp, avif
-// 2. Dynamic Media paths: contains '/is/image/'
-// 3. Absolute URLs starting with https://
-```
-
-**Valid image URLs that get decorated:**
-```
-✅ https://delivery-p66302-e574366.adobeaemcloud.com/.../hero.avif
-✅ https://s7ap1.scene7.com/is/image/mybrand/product
-✅ https://example.com/images/photo.jpg
-```
-
-**URLs that are NOT decorated:**
-```
-❌ https://example.com/document.pdf (not an image)
-❌ https://example.com/page.html (not an image)
-❌ /relative/path/image.jpg (relative paths not supported)
 ```
 
 ### 📊 Handler Functions
@@ -598,55 +549,6 @@ The plugin uses `isImageUrl()` function to validate image URLs:
    // ✅ Correct:
    createOptimizedPictureForDMOpenAPI  // uppercase 'API'
    ```
-
----
-
-### ❌ Smart Crop Not Working
-
-**Problem:** Images aren't using smart crop even though configured.
-
-**Symptoms:**
-- No `smartcrop` parameter in image URLs
-- Images not cropped differently at different breakpoints
-- All breakpoints show same crop
-
-**Solutions:**
-
-1. **Enable smart crop** at page, section, or block level:
-
-   **Option A - Page-level metadata:**
-   ```html
-   <meta name="smartcrop" content="true">
-   ```
-
-   **Option B - Section-level (in document):**
-   ```
-   | Section Metadata |
-   | smartcrop |
-   ```
-
-   **Option C - Block-level:**
-   ```html
-   <div class="block smartcrop">
-   ```
-
-2. **Verify smartCrops configuration**
-   ```javascript
-   // In aem-assets-plugin-support.js
-   smartCrops: {
-     Small: { minWidth: 0, maxWidth: 767 },
-     Medium: { minWidth: 768, maxWidth: 1023 },
-     Large: { minWidth: 1024, maxWidth: 9999 },
-   }
-   ```
-
-3. **Smart crop only works with DMwOAPI**
-   - Verify URL uses `createOptimizedPictureForDMOpenAPI` handler
-   - Scene7 URLs use different cropping mechanism
-
-4. **Check AEM Assets has smart crops**
-   - Named crops must exist in AEM Assets
-   - Crop names must match configuration
 
 ---
 
