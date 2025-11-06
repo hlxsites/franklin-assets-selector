@@ -775,58 +775,6 @@ console.log('Pictures on page:', document.querySelectorAll('picture').length);
 
 ---
 
-### ❌ Smart Crop Not Working
-
-**Problem:** Images aren't using smart crop even though configured.
-
-**Symptoms:**
-- No `data-smartcrop-status` attribute on images
-- Smart crop parameters not in URL query strings
-- Images not cropped differently at different breakpoints
-
-**Solutions:**
-
-1. **Verify smart crop is enabled** in one of three ways:
-
-   **Option A - Page-level metadata:**
-   ```html
-   <meta name="smartcrop" content="true">
-   ```
-
-   **Option B - Section-level metadata:**
-   ```
-   | Section Metadata |
-   | smartcrop |
-   ```
-
-   **Option C - Block-level class:**
-   ```html
-   <div class="block smartcrop" data-block-name="hero">
-   ```
-
-2. **Check smartCrops configuration**
-   ```javascript
-   // In aem-assets-plugin-support.js
-   window.hlx.aemassets = {
-     smartCrops: {
-       Small: { minWidth: 0, maxWidth: 767 },
-       Medium: { minWidth: 768, maxWidth: 1023 },
-       Large: { minWidth: 1024, maxWidth: 9999 },
-     },
-     // ...
-   };
-   ```
-
-3. **Verify image is DMwOAPI URL**
-   - Smart crop only works with `createOptimizedPictureForDMOpenAPI`
-   - Check that correct handler is being used
-
-4. **Check AEM Assets**
-   - Verify smart crop renditions exist in AEM Assets
-   - Named crops must match configuration (Small, Medium, Large)
-
----
-
 ### ❌ Images Not Lazy Loading
 
 **Problem:** All images load immediately, causing slow page load.
