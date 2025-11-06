@@ -58,6 +58,10 @@ Before you begin, ensure you have:
 
 ### 📝 Authoring Phase (Google Docs / Word)
 
+There are multiple ways to add external images in your documents:
+
+#### Method 1: Using AEM Assets Sidekick Plugin (Recommended)
+
 When you insert an AEM Asset image using the Sidekick plugin:
 
 1. You select an image from AEM Assets
@@ -65,7 +69,7 @@ When you insert an AEM Asset image using the Sidekick plugin:
 3. When published, it renders as an anchor tag:
 
 ```html
-<!-- What gets rendered from your document: -->
+<!-- From Sidekick or URL paste: -->
 <a href="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/hero.avif">
   Link text or image preview
 </a>
