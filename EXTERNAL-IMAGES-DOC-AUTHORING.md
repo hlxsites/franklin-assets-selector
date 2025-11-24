@@ -9,13 +9,10 @@ This guide explains how to retain and properly render external image URLs (such 
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
 3. [How Document-Based Authoring Handles Images](#how-document-based-authoring-handles-images)
-4. [Step 1: Install AEM Assets Plugin](#step-1-install-aem-assets-plugin)
-5. [Step 2: Configure External Image Handlers](#step-2-configure-external-image-handlers)
-6. [Step 3: Implement Image Decoration](#step-3-implement-image-decoration)
-7. [Step 4: Verify Implementation](#step-4-verify-implementation)
-8. [How It Works Under the Hood](#how-it-works-under-the-hood)
-9. [Troubleshooting](#troubleshooting)
-10. [Additional Resources](#additional-resources)
+4. [Install AEM Assets Plugin](#install-aem-assets-plugin)
+5. [Verify Implementation](#verify-implementation)
+6. [Troubleshooting](#troubleshooting)
+7. [Additional Resources](#additional-resources)
 
 ---
 
