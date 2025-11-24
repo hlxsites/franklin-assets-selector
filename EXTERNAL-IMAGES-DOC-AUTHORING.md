@@ -21,26 +21,16 @@ This guide explains how to retain and properly render external image URLs (such 
 
 ## Overview
 
-In document-based authoring (using Google Docs or Microsoft Word), when you insert images from AEM Assets with external URLs (Dynamic Media, Scene7, etc.), they are typically rendered as **anchor tags (`<a>`)** pointing to the image URL.
+In document-based authoring, when you insert images from AEM Assets with external URLs (Dynamic Media, Scene7, etc.), they are typically rendered OOTB as **anchor tags (`<a>`)** pointing to the image URL.
 
 To leverage responsive image delivery and optimization, you need to:
 
 1. **Detect anchor tags** that point to external image URLs
-2. **Decorate them into `<picture>` elements** with responsive sources using the AEM Assets Plugin
+2. **Decorate them into `<picture>` elements** with responsive sources using the [AEM Assets Plugin](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md)
 3. **Configure handlers** for different image source types (DMwOAPI, Scene7, etc.)
 
 **Key Difference from Universal Editor:**
 - ❌ No `externalImageUrlPrefixes` feature flag support in document-based authoring
-- ✅ External URLs are naturally retained as anchor tags
-- ✅ Frontend decoration handles everything automatically
-
-**Key Benefits:**
-- ✅ Responsive images with multiple breakpoints
-- ✅ Modern format support (AVIF, WebP) with fallbacks
-- ✅ Lazy loading for better performance
-- ✅ Smart cropping capabilities (optional)
-- ✅ Direct delivery from Dynamic Media CDN
-
 ---
 
 ## Prerequisites
@@ -56,11 +46,9 @@ Before you begin, ensure you have:
 
 ## How Document-Based Authoring Handles Images
 
-### 📝 Authoring Phase (Google Docs / Word)
+### 📝 Authoring Phase
 
-There are multiple ways to add external images in your documents:
-
-#### Method 1: Using AEM Assets Sidekick Plugin (Recommended)
+#### Using AEM Assets Sidekick Plugin
 
 When you insert an AEM Asset image using the Sidekick plugin:
 
@@ -105,7 +93,7 @@ The AEM Assets Plugin automatically detects and decorates these anchor tags:
 ### 🔄 Complete Flow
 
 ```
-1. Author inserts image in Google Doc/Word using Sidekick
+1. Author inserts image in Google Doc/Word using [Sidekick](https://www.aem.live/docs/aem-assets-sidekick-plugin)
    ↓
 2. Image URL from AEM Assets is added to document
    ↓
@@ -113,15 +101,15 @@ The AEM Assets Plugin automatically detects and decorates these anchor tags:
    ↓
 4. Page loads in browser
    ↓
-5. assetsInit() initializes plugin with URL prefix handlers
+5. assetsInit() initializes [plugin](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md) with URL prefix handlers
    ↓
-6. decorateExternalImages() runs during page decoration
+6. [decorateExternalImages()](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L572) runs during page decoration
    ↓
 7. Scans for <a> tags pointing to image URLs
    ↓
-8. Checks if URL matches configured external image prefixes
+8. Checks if URL matches configured [external image prefixes](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L143)
    ↓
-9. Validates the URL has an image extension or is an image path
+9. Validates the URL has an image extension or is an [image path](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L41)
    ↓
 10. Handler creates responsive <picture> element
    ↓
@@ -132,7 +120,7 @@ The AEM Assets Plugin automatically detects and decorates these anchor tags:
 
 ---
 
-## Step 1: Install AEM Assets Plugin
+## Install AEM Assets Plugin
 
 ### 📦 Installation
 
@@ -140,89 +128,7 @@ For complete installation instructions, refer to the official plugin documentati
 
 **📖 [AEM Assets Plugin Installation Guide](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md#installation)**
 
-**Quick Installation:**
-
-```bash
-git subtree add --squash --prefix plugins/aem-assets-plugin \
-  git@github.com:adobe-rnd/aem-assets-plugin.git main
-```
-
-**To update the plugin later:**
-
-```bash
-git subtree pull --squash --prefix plugins/aem-assets-plugin \
-  git@github.com:adobe-rnd/aem-assets-plugin.git main
-```
-
----
-
-## Step 2: Configure External Image Handlers
-
-### Create `scripts/aem-assets-plugin-support.js`
-
-This file initializes the plugin and configures which image URL prefixes should be handled:
-
-```javascript
-// The base path of the aem-assets-plugin code.
-const codeBasePath = `${window.hlx?.codeBasePath}/plugins/aem-assets-plugin`;
-
-// The blocks that are to be used from the aem-assets-plugin.
-const blocks = ['video', 'secure-assets'];
-
-// Initialize the aem-assets-plugin.
-export default async function assetsInit() {
-  const {
-    loadBlock,
-    createOptimizedPicture,
-    createOptimizedPictureWithSmartcrop,
-    createOptimizedPictureForDMOpenAPI,
-    createOptimizedPictureForDM,
-    decorateExternalImages,
-  } = await import(`${codeBasePath}/scripts/aem-assets.js`);
-
-  window.hlx = window.hlx || {};
-  window.hlx.aemassets = {
-    codeBasePath,
-    blocks,
-    loadBlock,
-    createOptimizedPicture,
-    createOptimizedPictureWithSmartcrop,
-    createOptimizedPictureForDMOpenAPI,
-    createOptimizedPictureForDM,
-    decorateExternalImages,
-    
-    // Configure smart crop breakpoints (optional)
-    smartCrops: {
-      Small: { minWidth: 0, maxWidth: 767 },
-      Medium: { minWidth: 768, maxWidth: 1023 },
-      Large: { minWidth: 1024, maxWidth: 9999 },
-    },
-    
-    // Configure external image URL handlers
-    // Each tuple: [URL prefix, handler function]
-    // The plugin checks <a> tags with these prefixes and converts to <picture>
-    externalImageUrlPrefixes: [
-      // Dynamic Media OpenAPI URLs
-      ['https://delivery-p66302-e574366.adobeaemcloud.com/', createOptimizedPictureForDMOpenAPI],
-      
-      // Scene7 / Dynamic Media Classic URLs
-      ['https://s7ap1.scene7.com/is/image/varuncloudready/', createOptimizedPictureForDM],
-      
-      // Add more prefixes as needed
-    ],
-  };
-
-  console.log('✅ AEM Assets Plugin initialized for document-based authoring');
-}
-```
-
 **Key Configuration:**
-
-- **`externalImageUrlPrefixes`**: Array of `[prefix, handler]` tuples
-  - Scans for **`<a>` tags** (not just `<img>` tags) with href matching these prefixes
-  - Validates that the URL points to an image (has image extension or is image path)
-  - First matching prefix determines which handler function is used
-  - Make sure prefixes match your actual image delivery domains
 
 - **Handler Functions**: Choose the appropriate handler for your image source
   - `createOptimizedPictureForDMOpenAPI` → Dynamic Media OpenAPI URLs (AVIF format)
@@ -231,74 +137,8 @@ export default async function assetsInit() {
 
 ---
 
-## Step 3: Implement Image Decoration
 
-### Update `scripts/scripts.js`
-
-For detailed integration steps, refer to the **[Project Instrumentation section](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md#project-instrumentation)** in the plugin README.
-
-**Key integration points:**
-
-```javascript
-import assetsInit from './aem-assets-plugin-support.js';
-
-/**
- * Decorates the main element.
- * @param {Element} main The main element
- */
-export function decorateMain(main) {
-  // IMPORTANT: Decorate external images FIRST
-  // This converts <a> tags pointing to images into <picture> elements
-  if (window.hlx.aemassets?.decorateExternalImages) {
-    window.hlx.aemassets.decorateExternalImages(main);
-  }
-  
-  // Standard decorations
-  decorateButtons(main);
-  decorateIcons(main);
-  buildAutoBlocks(main);
-  decorateSections(main);
-  decorateBlocks(main);
-}
-
-/**
- * Loads the page
- */
-async function loadPage() {
-  // Initialize assets plugin BEFORE loading page
-  await assetsInit();
-  
-  await loadEager(document);
-  await loadLazy(document);
-  loadDelayed();
-}
-
-loadPage();
-```
-
-### Optional: Override Functions in `scripts/aem.js`
-
-```javascript
-async function loadBlock(block) {
-  if (window.hlx?.aemassets?.loadBlock) {
-    return window.hlx.aemassets.loadBlock(block);
-  }
-  // ... standard implementation
-}
-
-function createOptimizedPicture(src, alt, eager, breakpoints) {
-  if (window.hlx?.aemassets?.createOptimizedPicture) {
-    return window.hlx.aemassets.createOptimizedPicture(src, alt, eager, breakpoints);
-  }
-  // ... standard implementation
-}
-```
-
-**📖 See the complete integration example:** [franklin-assets-selector commit](https://github.com/hlxsites/franklin-assets-selector/commit/f512e9b10d752971136fef476402826b61d07f45)
-
----
-
-## Step 4: Verify Implementation
+## Verify Implementation
 
 ### 🔍 Live Example
 
@@ -317,95 +157,6 @@ On this page, you'll see:
 1. **View Page Source** - You'll see anchor tags with external image URLs
 2. **Inspect Element** - You'll see decorated `<picture>` elements in the DOM
 3. **Network Tab** - Verify optimized images are being delivered
-
-### 🔧 Local Testing
-
-**Step-by-step verification:**
-
-1. **Create a test document** in Google Docs or Word
-2. **Insert an image** from AEM Assets using the Sidekick plugin
-3. **Publish the document** to your Edge Delivery site
-4. **View Page Source** (Ctrl/Cmd + U):
-   ```html
-   <!-- Should see anchor tag in source: -->
-   <a href="https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/urn:aaid:aem:12345/as/image.avif">
-   ```
-
-5. **Inspect Element** (Right-click → Inspect):
-   ```html
-   <!-- Should see picture element in DOM: -->
-   <picture>
-     <source media="(min-width: 600px)" type="image/avif" srcset="...?width=2000">
-     <source type="image/avif" srcset="...?width=750">
-     <source media="(min-width: 600px)" srcset="...?width=2000">
-     <img src="...?width=750" alt="" loading="lazy">
-   </picture>
-   ```
-
-6. **Open DevTools Network tab**:
-   - Filter by "Img"
-   - Refresh page
-   - Verify AVIF or WebP images are being loaded
-   - Check different widths are requested based on viewport
-
-### ✅ Verification Checklist
-
-- [ ] **Anchor Tags in Source**: External image URLs appear as `<a>` tags in page source
-- [ ] **Picture Wrapping**: Anchor tags are converted to `<picture>` elements in rendered DOM
-- [ ] **Multiple Sources**: Multiple `<source>` elements with different breakpoints exist
-- [ ] **Format Optimization**: AVIF or WebP format is being served (check Network tab)
-- [ ] **Responsive Behavior**: Different image sizes load based on viewport width
-- [ ] **Lazy Loading**: Images load lazily as you scroll
-- [ ] **No Console Errors**: No JavaScript errors in browser console
-- [ ] **Query Parameters**: Image URLs include query parameters like `?width=750`
-- [ ] **No Broken Images**: All images display correctly
-
----
-
-## How It Works Under the Hood
-
-### 🔄 Decoration Process
-
-The AEM Assets Plugin's `decorateExternalImages()` function works differently for document-based authoring:
-
-```
-1. decorateExternalImages(main) is called
-   ↓
-2. Scans for ALL <a> and <img> tags in container
-   ↓
-3. For each <a> tag:
-   ↓
-4. Extracts href attribute
-   ↓
-5. Checks if URL has image extension (.jpg, .png, .avif, etc.)
-   ↓
-6. OR checks if URL contains '/is/image/' (for Scene7/DM)
-   ↓
-7. If valid image URL:
-   ↓
-8. Checks against externalImageUrlPrefixes
-   ↓
-9. If prefix matches:
-   ↓
-10. Invokes corresponding handler function
-    ↓
-11. Handler creates <picture> element with:
-    - Multiple <source> elements for breakpoints
-    - Format optimization (AVIF/WebP)
-    - Responsive srcset attributes
-    - Width parameters
-    ↓
-12. Replaces <a> tag with <picture> in DOM
-```
-
-### 📊 Handler Functions
-
-| Handler | Input Format | Output Format | Use Case |
-|---------|-------------|---------------|----------|
-| `createOptimizedPictureForDMOpenAPI` | DMwOAPI URL | AVIF sources | AEM Assets with Dynamic Media OpenAPI |
-| `createOptimizedPictureForDM` | Scene7 URL | JPEG sources | Scene7/Dynamic Media Classic |
-| `createOptimizedPicture` | Any image URL | WebP + original | Standard external images |
-
 ---
 
 ## Troubleshooting
@@ -487,95 +238,6 @@ The AEM Assets Plugin's `decorateExternalImages()` function works differently fo
    curl -I https://delivery-p66302-e574366.adobeaemcloud.com/.../image.avif
    # Should return 200 OK
    ```
-
-2. **Check CORS settings**
-   - AEM Assets delivery must allow your domain
-   - Check browser console for CORS errors
-
-3. **Verify query parameters**
-   ```javascript
-   // Check Network tab - URLs should have width parameters
-   // ✅ Good:
-   https://delivery-p66302-e574366.adobeaemcloud.com/.../image.avif?width=750
-   
-   // ❌ Bad (might not render):
-   https://delivery-p66302-e574366.adobeaemcloud.com/.../image.avif
-   ```
-
-4. **Check image format support**
-   - AVIF may not be supported in older browsers
-   - Verify fallback sources are present
-   - Check if browser supports the format
-
----
-
-### ❌ Wrong Handler Being Called
-
-**Problem:** Images are decorated, but with wrong format or parameters.
-
-**Symptoms:**
-- JPEG instead of AVIF for DMwOAPI URLs
-- Wrong query parameters (e.g., `wid=` instead of `width=`)
-- Incorrect srcset URLs
-
-**Solutions:**
-
-1. **Check prefix order (first match wins)**
-   ```javascript
-   // ❌ Wrong - generic prefix comes first:
-   externalImageUrlPrefixes: [
-     ['https://delivery-p66302-e574366.adobeaemcloud.com/', createOptimizedPicture],
-     ['https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/', createOptimizedPictureForDMOpenAPI],
-   ]
-   
-   // ✅ Correct - most specific first:
-   externalImageUrlPrefixes: [
-     ['https://delivery-p66302-e574366.adobeaemcloud.com/adobe/assets/', createOptimizedPictureForDMOpenAPI],
-     ['https://delivery-p66302-e574366.adobeaemcloud.com/', createOptimizedPicture],
-   ]
-   ```
-
-2. **Be specific with prefixes**
-   ```javascript
-   // Include as much of the path as possible
-   ['https://s7ap1.scene7.com/is/image/mybrand/', createOptimizedPictureForDM],
-   ```
-
-3. **Verify handler function names**
-   ```javascript
-   // Check spelling - JavaScript is case-sensitive
-   // ❌ Wrong:
-   createOptimizedPictureForDMOpenApi  // lowercase 'a'
-   // ✅ Correct:
-   createOptimizedPictureForDMOpenAPI  // uppercase 'API'
-   ```
-
----
-
-### ❌ Console Errors
-
-**Common errors and solutions:**
-
-**Error:** `Cannot read property 'decorateExternalImages' of undefined`
-```javascript
-// Solution: Ensure assetsInit() completes before decorateMain()
-await assetsInit();
-loadPage();
-```
-
-**Error:** `Failed to load module: aem-assets.js`
-```javascript
-// Solution: Check plugin installation
-// Verify path: plugins/aem-assets-plugin/scripts/aem-assets.js exists
-// Check codeBasePath in aem-assets-plugin-support.js
-```
-
-**Error:** `URL is not a constructor`
-```javascript
-// Solution: Ensure anchor href is valid absolute URL
-// URLs must start with https://
-```
-
 ---
 
 ## Additional Resources
@@ -586,62 +248,9 @@ loadPage();
 - **[AEM Assets Sidekick Plugin](https://www.aem.live/docs/aem-assets-sidekick-plugin)** - Guide for inserting assets in documents
 - **[Dynamic Media Open API Overview](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/assets/dynamicmedia/dynamic-media-open-apis/dynamic-media-open-apis-overview)** - DMwOAPI documentation
 
-### 🌐 Live Examples
-
-- **[External Images Example - Main Branch](https://main--franklin-assets-selector--hlxsites.aem.live/ext-images/external-images-example)** - See external image decoration in action
-- **[Franklin Assets Selector (Main Branch)](https://main--franklin-assets-selector--hlxsites.aem.live/)** - Document-based authoring example site
-- **[Source Page](https://main--franklin-assets-selector--hlxsites.aem.page/ext-images/external-images-example)** - View document source for external images example
-
-### 🔧 Repository
-
-- **[AEM Assets Plugin Repository](https://github.com/adobe-rnd/aem-assets-plugin)** - Source code and updates
-- **[Franklin Assets Selector](https://github.com/hlxsites/franklin-assets-selector)** - Reference implementation
-
 ### 🎓 Learning Resources
 
 - **[AEM Assets Plugin Blocks](https://github.com/adobe-rnd/aem-assets-plugin/tree/main/blocks)** - Example blocks (video, secure-assets)
 - **[Plugin Tests](https://github.com/adobe-rnd/aem-assets-plugin/tree/main/tests)** - Unit tests
 
 ---
-
-## Summary
-
-By following this guide for document-based authoring, you have:
-
-1. ✅ **Understood the difference** between document-based and UE authoring for external images
-2. ✅ **Installed the AEM Assets Plugin** for image decoration
-3. ✅ **Configured external image URL handlers** to detect and decorate anchor tags
-4. ✅ **Implemented decoration logic** to convert `<a>` tags to `<picture>` elements
-5. ✅ **Verified the implementation** with live testing and DevTools
-
-### Key Takeaways
-
-- **No Feature Flag Needed**: Document-based authoring naturally retains external URLs as anchor tags
-- **Automatic Detection**: Plugin automatically detects `<a>` tags pointing to image URLs
-- **Handler Configuration**: `externalImageUrlPrefixes` determines which handler decorates each image
-- **Image Validation**: URLs must have image extensions or be recognized image paths
-- **Format Optimization**: Handlers create responsive images with AVIF/WebP formats
-- **Performance**: Lazy loading and responsive breakpoints optimize delivery
-
-### Next Steps
-
-1. **Test with your content** - Insert images from AEM Assets in your documents
-2. **Monitor performance** - Use Lighthouse to verify optimization
-3. **Customize breakpoints** - Adjust based on your design requirements
-4. **Enable smart crop** - For art-directed responsive images (DMwOAPI only)
-5. **Stay updated** - Pull latest plugin changes periodically
-
-Your document-based authoring site now delivers optimized, responsive images from AEM Assets! 🎉
-
----
-
-**Questions or issues?**
-
-- Check the [Troubleshooting](#troubleshooting) section
-- Review the [Live Examples](#live-examples)
-- Report bugs at [github.com/adobe-rnd/aem-assets-plugin/issues](https://github.com/adobe-rnd/aem-assets-plugin/issues)
-
----
-
-*Last updated: November 2025*
-
