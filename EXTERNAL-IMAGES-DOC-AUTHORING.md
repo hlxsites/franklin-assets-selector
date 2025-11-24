@@ -92,31 +92,51 @@ The AEM Assets Plugin automatically detects and decorates these anchor tags:
 
 ### 🔄 Complete Flow
 
-```
 1. Author inserts image in Google Doc/Word using [Sidekick](https://www.aem.live/docs/aem-assets-sidekick-plugin)
+   
    ↓
+   
 2. Image URL from AEM Assets is added to document
+   
    ↓
-3. Document published → Renders as <a> tag with href to image URL
+   
+3. Document published → Renders as `<a>` tag with href to image URL
+   
    ↓
+   
 4. Page loads in browser
+   
    ↓
-5. assetsInit() initializes [plugin](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md) with URL prefix handlers
+   
+5. `assetsInit()` initializes [plugin](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/README.md) with URL prefix handlers
+   
    ↓
-6. [decorateExternalImages()](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L572) runs during page decoration
+   
+6. [`decorateExternalImages()`](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L572) runs during page decoration
+   
    ↓
-7. Scans for <a> tags pointing to image URLs
+   
+7. Scans for `<a>` tags pointing to image URLs
+   
    ↓
+   
 8. Checks if URL matches configured [external image prefixes](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L143)
+   
    ↓
+   
 9. Validates the URL has an image extension or is an [image path](https://github.com/adobe-rnd/aem-assets-plugin/blob/main/scripts/aem-assets.js#L41)
+   
    ↓
-10. Handler creates responsive <picture> element
-   ↓
-11. Original <a> tag replaced with optimized <picture> in DOM
-   ↓
+   
+10. Handler creates responsive `<picture>` element
+   
+    ↓
+    
+11. Original `<a>` tag replaced with optimized `<picture>` in DOM
+   
+    ↓
+    
 12. Browser loads appropriate image based on viewport and format support
-```
 
 ---
 
