@@ -1,0 +1,763 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/no-cycle */
+import {
+  loadHeader,
+  loadFooter,
+  decorateIcons,
+  decorateSections,
+  decorateBlock,
+  decorateBlocks,
+  decorateTemplateAndTheme,
+  waitForFirstImage,
+  loadSection,
+  loadSections,
+  loadCSS,
+  loadBlock,
+  getMetadata,
+  buildBlock,
+  fetchPlaceholders,
+} from './aem.js';
+import { initialiseMartech, loadMartechEager, loadMartechDelayed, loadMartechLazy } from './martech/martech.js';
+import { isAuthorMode, resolveFolderName } from './utils/common-utils.js';
+import buildAutoBlocksLazy from './auto-block-lazy.js';
+import decorateTabs from '../blocks/tabs/tabs-helper.js';
+
+// -----------------------------
+// Custom code start
+
+export const ENVIRONMENT = {
+  DEV: 'dev',
+  PROD: 'prod',
+  STAGE: 'stage',
+  TEST: 'test',
+  UAT: 'uat',
+};
+
+const CONTENT_ROOT_PATH = '/content/qcom';
+
+const QCOM_CONFIG_PUBLIC_PATH = 'qcom-config/public';
+
+const PLACEHOLDER = 'placeholder';
+
+export const isHomePage = String(getMetadata('template') || '') === 'homepage';
+
+export const currentTemplate = getMetadata('template');
+
+let templateModule = null;
+
+async function loadTemplateModule(template) {
+  if (!templateModule) {
+    templateModule = await import(`./templates/${template}.js`);
+  }
+  return templateModule;
+}
+
+export async function decorateAnchorSections(main) {
+  if (
+    document.querySelector('[data-anchor-section-url]') &&
+    document.querySelector('[data-anchor-link-text]')
+  ) {
+    /* eslint-disable import/no-cycle */
+    const { default: buildAnchorSection } = await import('./sections/build-anchor-section.js');
+    buildAnchorSection(main);
+  }
+}
+
+async function loadBreadcrumbs(main) {
+  const hideBreadcrumbs = getMetadata('hidebreadcrumb');
+  const showBreadcrumbs = !(hideBreadcrumbs === 'true');
+  const breadcrumbExists = document.querySelector('.breadcrumbs');
+
+  if (!showBreadcrumbs || breadcrumbExists) {
+    return null;
+  }
+
+  const breadcrumbsBlock = buildBlock('breadcrumbs', '');
+
+  const section = document.createElement('div');
+  section.classList.add('section');
+  section.append(breadcrumbsBlock);
+  main.parentNode.insertBefore(section, main);
+
+  decorateBlock(breadcrumbsBlock);
+  return loadBlock(breadcrumbsBlock);
+}
+
+function hideHomePageHeading(main) {
+  const hidePageHeading = getMetadata('hide-homepage-heading');
+  const hideHeading = (hidePageHeading === 'true');
+  const firstH1 = main.querySelector('.section .default-content-wrapper h1');
+  if (firstH1 && hideHeading) {
+    firstH1.classList.add('visually-hidden');
+  }
+}
+
+async function loadGlobalAlert() {
+  const alertsExists = document.querySelector('.alerts.block');
+  if (alertsExists) {
+    return null;
+  }
+
+  const alertsBlock = buildBlock('alerts', '');
+
+  const section = document.createElement('div');
+  section.classList.add('section');
+  section.append(alertsBlock);
+
+  const header = document.querySelector('header');
+  document.body.insertBefore(section, header);
+
+  decorateBlock(alertsBlock);
+  await loadBlock(alertsBlock);
+  return alertsBlock;
+}
+
+function loadSkipToElements() {
+  const skipToElementsExists = document.querySelector('.skip-to-elements');
+
+  if (skipToElementsExists) {
+    return;
+  }
+
+  // If not header, do not load skip to elements
+  const header = document.querySelector('header');
+  if (!header) {
+    return;
+  }
+
+  const skipToElementsBlcok = buildBlock('skip-to-elements', '');
+
+  const section = document.createElement('div');
+  section.classList.add('section');
+  section.append(skipToElementsBlcok);
+
+  document.body.prepend(section);
+
+  decorateBlock(skipToElementsBlcok);
+  loadBlock(skipToElementsBlcok);
+}
+
+/**
+ * Helper function that check if It is EDS path.
+ */
+export function isEDSLink(linkURL) {
+  return linkURL.includes(CONTENT_ROOT_PATH);
+}
+
+/**
+ * Helper function that converts an AEM path into an EDS path.
+ */
+export function getEDSLink(aemPath) {
+  if (!aemPath) {
+    return '';
+  }
+
+  let aemRoot = CONTENT_ROOT_PATH;
+
+  if (window.hlx && window.hlx.aemRoot) {
+    aemRoot = window.hlx.aemRoot;
+  }
+
+  return aemPath.replace(aemRoot, '').replace('.html', '');
+}
+/**
+ * Helper function that adapts the path to work on EDS and AEM rendering
+ */
+export function getLink(edsPath) {
+  return window.hlx.aemRoot && !edsPath.startsWith(window.hlx.aemRoot) && edsPath.indexOf('.html') === -1
+    ? `${window.hlx.aemRoot}${edsPath}.html`
+    : edsPath;
+}
+
+/**
+ * Process current pathname and return details for use in language switching
+ * Considers pathnames like /en-au/page and /content/qcom/en-au/page.html
+ * for both EDS and AEM
+ */
+export function getPathDetails() {
+  const { pathname } = window.location;
+  const extParts = pathname.split('.');
+  const ext = extParts.length > 1 ? extParts[extParts.length - 1] : '';
+  const isContentPath = pathname.startsWith('/content');
+  const parts = pathname.split('/').filter(Boolean); // remove empty entries
+
+  // Utility to safely extract language/region parts
+  const safeLangGet = (index) => {
+    const val = parts[index];
+    return val ? val.split('.')[0].toLowerCase() : '';
+  };
+
+  let langRegion = 'en-au';
+
+  if (window.hlx && window.hlx.isExternalSite === true) {
+    // Handle third-party site with /lang/region
+    // Use langregion from hlx if present and non-empty
+    const hlxLangRegion = window.hlx.langregion?.toLowerCase();
+
+    if (hlxLangRegion) {
+      langRegion = hlxLangRegion;
+    } else if (parts.length >= 2) {
+      const ISO_2_LETTER = /^[a-z]{2}$/;
+      const region = isContentPath ? safeLangGet(2) : safeLangGet(0);
+      let language = isContentPath ? safeLangGet(3) : safeLangGet(1);
+
+      // Normalize language if it contains underscore (e.g.: zh_CN -> zh)
+      [language] = language.split('_');
+
+      // Validate both language and region before assignment
+      if (ISO_2_LETTER.test(language) && ISO_2_LETTER.test(region)) {
+        langRegion = `${language}-${region}`;
+      }
+    }
+  } else {
+    // AEM/EDS paths
+    langRegion = isContentPath ? safeLangGet(2) : safeLangGet(0);
+  }
+
+  // Split langRegion into lang and region
+  let [lang, region] = langRegion.split('-');
+
+  const isLanguageMasters = langRegion === 'language-masters';
+
+  if (region === 'masters') region = 'au';
+  if (lang === 'language') lang = 'en';
+  if (isLanguageMasters) langRegion = 'en-au';
+
+  // substring before langRegion
+  const prefix = pathname.substring(0, pathname.indexOf(`/${langRegion}`)) || '';
+  const suffix = pathname.substring(pathname.indexOf(`/${langRegion}`) + langRegion.length + 1) || '';
+
+  return {
+    ext,
+    prefix,
+    suffix,
+    langRegion,
+    lang,
+    region,
+    isContentPath,
+    isLanguageMasters,
+  };
+}
+
+function getLanguageCode(langRegion) {
+  let langCode = langRegion || getPathDetails()?.langRegion || 'en-au';
+  if (isAuthorMode() && langCode === 'language-masters') {
+    langCode = 'en-au';
+  }
+  return langCode;
+}
+
+/**
+ * Converts a given link to include the current language-region segment.
+ *
+ * - If the link is falsy, returns an empty string.
+ * - Retrieves the current language-region from `getPathDetails()`.
+ * - If the url starts with /global/en (on prem), replaces it with the current region and language.
+ * - If not in author mode, transforms the link using `getEDSLink()`.
+ * - If the URL starts with '/', replaces any existing language-region segment
+ *   (e.g., `/language-masters/en` or `/fr-fr`) with the current `langRegion`.
+ *
+ * @param {string} link - The original URL or path to convert.
+ * @returns {string} The URL with the correct language-region segment.
+ */
+export function convertToLangRegionLink(link) {
+  if (!link) return '';
+
+  const LM_EN_SEGMENT = '/language-masters/en';
+
+  // Relative-only on‑prem detector matches: /global/en...html or /region/lang...html
+  const REL_ON_PREM_HTML =
+    /^\/(?:global\/en|[a-z]{2}\/[a-zA-Z_-]{2,8})[^?#;]*\.html(?:$|[?#;].*|\/.*)$/i;
+
+  // Absolute *.qantas.com/global/en
+  const ABS_QANTAS_GLOBAL_EN =
+    /^(https?:\/\/[^/]*\.qantas\.com)\/global\/en(?=\/|\.|$)/i;
+
+  const { langRegion, lang, region } = getPathDetails();
+  const mapped = window.eds_config?.onPremLangRegionMapping?.[langRegion];
+  const onPremMarker = mapped ? `/${mapped}` : `/${region}/${lang}`;
+
+  const isAbsolute = (url) => /^https?:\/\//i.test(url);
+
+  const replaceLmEn = (url) =>
+    (url.includes(LM_EN_SEGMENT) ? url.replace(LM_EN_SEGMENT, `/${langRegion}`) : url);
+
+  // 1) Absolute on‑prem, only rewrite absolute qantas.com/global/en → /{region}/{lang or mapped}
+  if (isAbsolute(link)) {
+    return ABS_QANTAS_GLOBAL_EN.test(link)
+      ? link.replace(ABS_QANTAS_GLOBAL_EN, `$1${onPremMarker}`)
+      : link; // non-qantas or not /global/en → unchanged
+  }
+
+  // 2) Relative on‑prem, rewrite only /global/en; keep all other on‑prem .html links unchanged
+  if (REL_ON_PREM_HTML.test(link)) {
+    return /^\/global\/en(?=\/|\.|$)/i.test(link)
+      ? link.replace(/^\/global\/en(?=\/|\.|$)/i, onPremMarker)
+      : link;
+  }
+
+  // 3) Relative paths EDS
+  if (link.startsWith('/')) {
+    // Normalize to EDS, then optionally rewrite /language-masters/en
+    let eds = getEDSLink(link);
+    eds = replaceLmEn(eds);
+
+    // if Author mode then convert the link to /content/qcom + .html, else keep EDS
+    return isAuthorMode() ? getLink(eds) : eds;
+  }
+
+  return link;
+}
+
+export function convertAllLangRegionLinkInHTML(htmlString) {
+  const container = document.createElement('div');
+  container.innerHTML = htmlString;
+
+  const links = container.querySelectorAll('a[href]');
+  links.forEach((link) => {
+    const originalHref = link.getAttribute('href');
+    const newHref = convertToLangRegionLink(originalHref);
+    link.setAttribute('href', newHref);
+  });
+
+  return container.innerHTML;
+}
+
+export function getTokenisedPlaceholders() {
+  if (window.tokenisedPlaceholders) return window.tokenisedPlaceholders;
+  const { langRegion, lang } = getPathDetails();
+  const languagesToTry = [langRegion, lang, 'en'].filter(Boolean);
+  const tokenisedPlaceholders =
+    languagesToTry
+      .map((language) => window.eds_config?.tokenisedPlaceholders?.[language])
+      .find(Boolean) || null;
+  window.tokenisedPlaceholders = tokenisedPlaceholders;
+  return tokenisedPlaceholders;
+}
+
+export async function fetchLanguagePlaceholders(langRegion) {
+  const langCode = getLanguageCode(langRegion);
+  const placeholderPath = resolveFolderName(langCode, PLACEHOLDER);
+  try {
+    // Try fetching placeholders with the specified language
+    return await fetchPlaceholders(`${window.hlx.codeBasePath}/${QCOM_CONFIG_PUBLIC_PATH}/${placeholderPath}`);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error fetching placeholders for lang: ${placeholderPath}. Will try to get en placeholders`, error);
+    // Retry without specifying a language (using the default language)
+    try {
+      return await fetchPlaceholders(`${window.hlx.codeBasePath}/${QCOM_CONFIG_PUBLIC_PATH}/en`);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching placeholders:', err);
+    }
+  }
+  return {}; // default to empty object
+}
+
+/**
+ * Gets taxonomies object.
+ * @returns {object} Window taxonomies object
+ */
+export async function fetchLanguageTaxonomies() {
+  const { lang, langRegion } = getPathDetails();
+
+  window.taxonomies = window.taxonomies || {};
+  if (!window.taxonomies[langRegion]) {
+    try {
+      const resp = await fetch(`${window.eds_config?.global?.taxonomyPath}`);
+      if (!resp.ok) {
+        return {};
+      }
+      const json = await resp.json();
+      const data = json.default ? json.default?.data : json.data;
+
+      const taxonomies = {};
+      data
+        .forEach((taxonomy) => {
+          // See if "jcr:title.<lang-region>" exists
+          let localeTaxonomyLabel = taxonomy[`jcr:title.${langRegion}`];
+
+          // Then see if "jcr:title.<lang>" exists
+          if (!localeTaxonomyLabel) {
+            localeTaxonomyLabel = taxonomy[`jcr:title.${lang}`];
+          }
+          // Otherwise fallback to default locale in "title"
+          if (!localeTaxonomyLabel) {
+            localeTaxonomyLabel = taxonomy.title;
+          }
+          taxonomies[taxonomy.tag] = localeTaxonomyLabel;
+        });
+      window.taxonomies[langRegion] = taxonomies;
+      return window.taxonomies[langRegion];
+    } catch (error) {
+      console.error('Error fetching taxonomies ', error);
+      window.taxonomies[langRegion] = {};
+      return window.taxonomies[langRegion];
+    }
+  }
+  return window.taxonomies[langRegion];
+}
+
+/**
+ * Retrieves the list of allowed blocks from meta "allowed-blocks".
+ * Returns ["*"] if the meta content is "all" (case-insensitive), empty, or missing.
+ * @returns {string[]} Array of allowed block names or ["*"] to allow all.
+ */
+function getAllowedBlocks() {
+  const allowedBlocks = getMetadata('allowed-blocks');
+
+  // If no value, empty, or equals 'all', treat as allow all
+  if (!allowedBlocks || allowedBlocks.toLowerCase().trim() === 'all') {
+    return ['*'];
+  }
+
+  return allowedBlocks.split(',').map((b) => b.trim()).filter(Boolean);
+}
+
+/**
+ * Retrieves the list of blocks to hide from meta "hide-blocks".
+ * @returns {string[]} Array of block names to hide.
+ */
+function getHideBlocks() {
+  const hideBlocks = getMetadata('hide-blocks');
+  return hideBlocks.split(',').map((b) => b.trim()).filter(Boolean);
+}
+
+/**
+ * Removes blocks from the DOM that are either explicitly hidden or not allowed.
+ * - Blocks are matched by their first CSS class name.
+ * - Allowed blocks are from the meta "allowed-blocks".
+ * - Hidden blocks are from the meta "hide-blocks".
+ * - If allowed blocks includes "*", all blocks are allowed except hidden ones.
+ *
+ * @param {Element} root The root DOM element to filter blocks inside. Defaults to document.
+ */
+export function filterBlocks(root = document) {
+  const metaAllowedBlocks = getAllowedBlocks();
+  const allowedBlocks = new Set(metaAllowedBlocks);
+  const hideBlocks = new Set(getHideBlocks());
+
+  root.querySelectorAll('div.section > div > div').forEach((block) => {
+    const blockName = block.classList[0];
+    if (!blockName) return;
+
+    // Allow all blocks unless explicitly hidden
+    const allowAll = allowedBlocks.has('*');
+    if (hideBlocks.has(blockName) || (!allowAll && !allowedBlocks.has(blockName))) {
+      // Remove the wrapper div and the block itself from DOM
+      block.parentNode.remove();
+      block.remove();
+    }
+  });
+}
+
+/**
+ * Checks if a feature is enabled based on meta "features" tag in the head.
+ * @param {string} featureName - Feature name to check.
+ * @returns {boolean} true if feature is enabled, false otherwise.
+ */
+export function isFeatureEnabled(featureName) {
+  const featuresMeta = getMetadata('features');
+  if (!featuresMeta) return false;
+  const features = featuresMeta.split(',').map((f) => f.trim().toLowerCase());
+  return features.includes(featureName.toLowerCase());
+}
+
+async function callTemplateFunctionIfConfigured(template, phase, main) {
+  const templateScripts = window.eds_config?.template_scripts?.[template];
+  if (!templateScripts || !templateScripts.entrypoints.includes(phase)) return;
+
+  // Dynamically import the template module
+  const module = await loadTemplateModule(template);
+  if (typeof module[phase] === 'function') {
+    await module[phase](main);
+  }
+}
+
+/**
+ * Builds and initializes blocks that should render before the body appears to avoid CLS
+ *
+ * @param {HTMLElement} main - The main content container element.
+ */
+async function buildPreHeaderBlocks(main) {
+  if (isHomePage) {
+    await loadGlobalAlert(main);
+  }
+}
+
+function setNaverTags(langRegion) {
+  if (langRegion === 'en-kr' || langRegion === 'ko-kr') {
+    const head = document.querySelector('head');
+
+    const metaLanguage = document.createElement('meta');
+    const metaNaver = document.createElement('meta');
+
+    metaLanguage.setAttribute('http-equiv', 'content-language');
+    metaLanguage.setAttribute('content', langRegion);
+    head.appendChild(metaLanguage);
+
+    metaNaver.setAttribute('name', 'naver-site-verification');
+    metaNaver.setAttribute('content', '');
+    head.appendChild(metaNaver);
+  }
+}
+
+function convertHyphenLocaleToUnderscore(langRegion) {
+  if (!langRegion) return '';
+  const parts = langRegion.split('-');
+  if (parts.length !== 2) return langRegion;
+  return `${parts[0]}_${parts[1].toUpperCase()}`;
+}
+
+function setOgLocale(langRegion) {
+  const meta = document.createElement('meta');
+  const head = document.querySelector('head');
+
+  meta.setAttribute('property', 'og:locale');
+  meta.setAttribute('content', convertHyphenLocaleToUnderscore(langRegion));
+  head.appendChild(meta);
+}
+
+function setOauthConfig() {
+  const redirectUrl = getMetadata('oauthloginredirect') || '';
+  window.oauthConfig = { isEnabled: true, successRedirectUrl: redirectUrl };
+}
+
+function setHeaderCustomFields() {
+  const { langRegion, lang, region } = getPathDetails();
+  setOgLocale(langRegion);
+  setNaverTags(langRegion);
+  if (lang && region) {
+    document.documentElement.lang = `${lang}-${region.toUpperCase()}`;
+  } else {
+    document.documentElement.lang = 'en-AU';
+  }
+}
+
+/**
+ * Builds and initializes blocks that should render eagerly
+ *
+ * @param {HTMLElement} main - The main content container element.
+ */
+async function buildEagerBlocks(main) {
+  setHeaderCustomFields();
+  setOauthConfig();
+
+  await callTemplateFunctionIfConfigured(currentTemplate, 'buildEagerBlocks', main);
+}
+
+// Custom code end
+// ------------------------------
+
+/**
+ * Moves all the attributes from a given elmenet to another given element.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ */
+export function moveAttributes(from, to, attributes) {
+  if (!attributes) {
+    // eslint-disable-next-line no-param-reassign
+    attributes = [...from.attributes].map(({ nodeName }) => nodeName);
+  }
+  attributes.forEach((attr) => {
+    const value = from.getAttribute(attr);
+    if (value) {
+      to.setAttribute(attr, value);
+      from.removeAttribute(attr);
+    }
+  });
+}
+
+/**
+ * Move instrumentation attributes from a given element to another given element.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ */
+export function moveInstrumentation(from, to) {
+  moveAttributes(
+    from,
+    to,
+    [...from.attributes]
+      .map(({ nodeName }) => nodeName)
+      .filter((attr) => attr.startsWith('data-aue-') || attr.startsWith('data-richtext-')),
+  );
+}
+
+/**
+ * load fonts.css and set a session storage flag
+ */
+async function loadFonts() {
+  await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
+  try {
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+  } catch (e) {
+    // do nothing
+  }
+}
+/**
+ * Apply fixes specific to iOS VoiceOver Screen Reader.
+ * It will only be executed if the user is on an iOS device.
+ */
+async function loadIOSVoiceOverFixes() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    const { default: applyFixes } = await import('./ios-voiceover-fixes.js');
+    applyFixes();
+  }
+}
+
+/**
+ * Builds all synthetic blocks in a container element.
+ */
+function buildAutoBlocks(main) {
+  try {
+    loadSkipToElements();
+    decorateTabs(main);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Auto Blocking failed', error);
+  }
+}
+
+/**
+ * Decorates the main element.
+ * @param {Element} main The main element
+ */
+export function decorateMain(main) {
+  // hopefully forward compatible button decoration
+  decorateIcons(main);
+  buildAutoBlocks(main);
+  decorateSections(main);
+  filterBlocks(main);
+  decorateBlocks(main);
+  decorateAnchorSections(main);
+}
+
+/**
+ * Loads everything needed to get to LCP.
+ * @param {Element} doc The container element
+ */
+async function loadEager(doc) {
+  // MarTech config
+  const martechLoadedPromise = initialiseMartech();
+
+  decorateTemplateAndTheme();
+
+  const main = doc.querySelector('main');
+  await buildEagerBlocks(main);
+
+  const header = doc.querySelector('header');
+  if (header) {
+    loadHeader(header);
+  }
+
+  if (main) {
+    decorateMain(main);
+    await buildPreHeaderBlocks(main);
+    document.body.classList.add('appear');
+    await Promise.all([martechLoadedPromise.then(loadMartechEager),
+      loadSection(main.querySelector('.section'), waitForFirstImage)]);
+  }
+
+  try {
+    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
+    if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
+      loadFonts();
+    }
+  } catch (e) {
+    // do nothing
+  }
+}
+
+/**
+ * Builds and initializes blocks that should render early
+ * (immediately after the main content is loaded),
+ * but are still part of the lazy-loading phase.
+ *
+ * @param {HTMLElement} main - The main content container element.
+ */
+async function buildEarlyBlocks(main) {
+  loadBreadcrumbs(main);
+  if (isHomePage) {
+    hideHomePageHeading(main);
+  }
+  await callTemplateFunctionIfConfigured(currentTemplate, 'buildEarlyBlocks', main);
+}
+
+/**
+ * Loads everything that doesn't need to be delayed.
+ * @param {Element} doc The container element
+ */
+async function loadLazy(doc) {
+  const main = doc.querySelector('main');
+  const { hash } = window.location;
+  if (main) {
+    buildEarlyBlocks(main);
+    await loadSections(main);
+  }
+  const footer = doc.querySelector('footer');
+  if (footer) {
+    await loadFooter(footer);
+  }
+  const element = hash ? doc.getElementById(hash.substring(1)) : false;
+  if (hash && element) element.scrollIntoView();
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
+  buildAutoBlocksLazy(main);
+  await loadMartechLazy();
+}
+
+/**
+ * Loads everything that happens a lot later,
+ * without impacting the user experience.
+ */
+function loadDelayed() {
+  // eslint-disable-next-line import/no-cycle
+  window.setTimeout(() => {
+    loadIOSVoiceOverFixes();
+    loadMartechDelayed();
+  }, 3000);
+  // load anything that can be postponed to the latest here
+}
+
+async function loadPage() {
+  await loadEager(document);
+  await loadLazy(document);
+  loadDelayed(document);
+}
+
+export const getEnvFromUrl = (
+  url = (typeof window !== 'undefined' ? window.location.href : '')) => {
+  try {
+    const { hostname } = new URL(url.toLowerCase());
+    const labels = hostname.split('.');
+
+    if (labels.includes('dev')) return ENVIRONMENT.DEV;
+    if (labels.includes('test')) return ENVIRONMENT.TEST;
+    if (labels.includes('uat')) return ENVIRONMENT.UAT;
+    if (labels.includes('stage')) return ENVIRONMENT.STAGE;
+
+    return ENVIRONMENT.PROD; // default fallback
+  } catch (_) {
+    return ENVIRONMENT.PROD; // malformed/empty URL → treat as prod
+  }
+};
+
+export const getEnv = () => (getMetadata('env') || getEnvFromUrl() || ENVIRONMENT.PROD);
+
+/* load configs */
+const buildConfig = async () => {
+  if (!window.eds_config) {
+    const env = getEnv().toLowerCase();
+    const { config } = (await import(`./config/${env}.js`));
+    window.eds_config = config;
+  }
+};
+
+await buildConfig();
+
+// Load the page if it is not being called from a external site
+if (!window.hlx?.isExternalSite) {
+  loadPage();
+}

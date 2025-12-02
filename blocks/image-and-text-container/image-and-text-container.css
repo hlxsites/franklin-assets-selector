@@ -1,0 +1,406 @@
+/* 
+ * -------------------------------
+ * Image and Text Container
+ * -------------------------------
+ */
+.image-and-text-container > .image-text-wrapper {
+  display: grid;
+  gap: var(--spacing-alias-responsive-600-to-1400) var(--body-gutter);
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Full width and ignore the body margin */
+.image-and-text-container.layout-1-col {
+  margin: 0 calc(-1 * var(--body-margin));
+}
+
+/* Breakpoint - screen md and above */
+@media (min-width: 36rem) {
+  .image-and-text-container.layout-2-col > .image-text-wrapper,
+  .image-and-text-container.layout-3-col.stacked > .image-text-wrapper,
+  .image-and-text-container.layout-4-col > .image-text-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Breakpoint - screen lg and above */
+@media (min-width: 64rem) {
+  /* Remove Full Width and stay within body margin */
+  .image-and-text-container.layout-1-col {
+    margin: 0;
+  }
+
+  .image-and-text-container.layout-3-col > .image-text-wrapper,
+  .image-and-text-container.layout-3-col.stacked > .image-text-wrapper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .image-and-text-container.layout-4-col > .image-text-wrapper {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 
+ * -------------------------------
+ * Image and Text Item
+ * -------------------------------
+ */
+.image-and-text {
+  --content-gap: var(--spacing-alias-responsive-200-to-400);
+  --heading-container-gap: var(--spacing-alias-fixed-100);
+  --border-radius-terminal: var(--border-radius-base-8-0);
+  --border-radius-1-col: var(--border-radius-alias-fixed-xl);
+  --content-container-extra-padding: var(--spacing-alias-responsive-300-to-700);
+  --content-container-offset: var(--spacing-base-10-0);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/**
+ * Image
+ */
+.imagetext-image-container {
+  position: relative;
+  margin: 0;
+}
+
+.imagetext-image-container picture {
+  display: flex;
+  width: 100%;
+}
+
+.imagetext-image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-alias-fixed-md);
+  aspect-ratio: 3 / 2;
+}
+
+.highlighted .imagetext-image-container img {
+  aspect-ratio: 4 / 5;
+}
+
+/* Do not round full width images */
+.layout-1-col .imagetext-image-container img {
+  border-radius: 0;
+}
+
+.layout-2-col:not(.stacked, .image-curve-disabled)
+  .last-item
+  .imagetext-image-container
+  img,
+.layout-3-col:not(.stacked, .image-curve-disabled)
+  .last-item
+  .imagetext-image-container
+  img {
+  border-bottom-right-radius: var(--border-radius-terminal);
+}
+
+/**
+ * Badge
+ */
+.imagetext-badge {
+  --badge-margin: var(--spacing-alias-responsive-200-to-400);
+  --badge-padding-y: var(--badge-padding-y-sm);
+  --badge-padding-x: var(--badge-padding-x-sm);
+  --badge-font-size: var(--badge-font-size-sm);
+  --badge-line-height: var(--badge-line-height-sm);
+
+  position: absolute;
+  text-align: center;
+  font-weight: 500;
+  background-color: var(--color-alias-notification-info-background);
+  color: var(--color-alias-notification-info-text);
+  border-radius: var(--border-radius-alias-fixed-sm);
+  margin: var(--badge-margin);
+  padding: var(--badge-padding-y) var(--badge-padding-x);
+
+  /* There's no typography style for badge */
+  font-size: var(--badge-font-size);
+  line-height: var(--badge-line-height);
+}
+
+.layout-1-col .imagetext-badge {
+  margin: var(--badge-margin) var(--body-margin);
+}
+
+/**
+ * Caption
+ */
+.imagetext-caption {
+  display: block;
+  color: var(--color-alias-text-secondary);
+  margin: var(--spacing-comp-web-spacer-md) 0 0;
+}
+
+/**
+ * Content Container
+ */
+.imagetext-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--content-gap);
+  margin-top: var(--content-gap);
+  background: var(--color-alias-surface-background-primary);
+}
+
+.layout-1-col .imagetext-content-container {
+  position: relative;
+  top: calc(-1 * var(--content-container-offset));
+  min-height: var(--spacing-base-10-0);
+  margin-bottom: calc(-1 * var(--content-container-offset));
+  padding: var(--spacing-alias-responsive-200-to-400)
+    var(--spacing-alias-responsive-200-to-400) 0;
+  margin-top: 0;
+  z-index: 1;
+}
+
+.layout-1-col .image-left .imagetext-content-container {
+  left: var(--body-margin);
+  margin-right: var(--body-margin);
+  border-radius: var(--border-radius-1-col) 0 0 0;
+  padding-right: var(--body-margin);
+}
+
+.layout-1-col .image-right .imagetext-content-container {
+  right: var(--body-margin);
+  margin-left: var(--body-margin);
+  border-radius: 0 var(--border-radius-1-col) 0 0;
+  padding-left: var(--body-margin);
+}
+
+/**
+ * Heading Container (Category & Title)
+ */
+.imagetext-heading-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--heading-container-gap);
+}
+
+.imagetext-category {
+  color: var(--color-alias-text-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.imagetext-title {
+  margin: 0;
+}
+
+.imagetext-content-container > *,
+.imagetext-heading-container > * {
+  max-width: var(--sizing-alias-typography-max-width-standard);
+}
+
+/**
+ * Remaining fields within Content Container
+ */
+.imagetext-intro-text,
+.imagetext-intro-text p {
+  margin: 0;
+}
+
+.imagetext-body-text {
+  margin: 0;
+}
+
+.imagetext-body-text p {
+  margin-bottom: var(--content-gap);
+}
+
+/* Remove the last bottom spacing added by non p tags */
+.imagetext-body-text > :last-child {
+  margin-bottom: 0;
+}
+
+.imagetext-links-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-comp-web-spacer-xl);
+  margin-bottom: 0;
+}
+
+.imagetext-links-container a {
+  display: inline-block;
+}
+
+.imagetext-links-container a::after {
+  width: var(--sizing-alias-icon-frame-xs);
+  height: var(--sizing-alias-icon-frame-xs);
+  mask: url('../../icons/runway_icon_arrow_right.svg') no-repeat center;
+  background-color: currentColor;
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: var(--spacing-alias-fixed-50);
+}
+
+/* External link icon */
+.imagetext-links-container a.standalone--external::after {
+  mask: url('../../icons/runway_icon_open_in_external.svg') no-repeat center;
+  vertical-align: sub;
+}
+
+/* Breakpoint - screen sm-md specific */
+@media (max-width: 63.999rem) {
+  .image-right.image-and-text {
+    flex-direction: column-reverse;
+  }
+
+  .layout-1-col .imagetext-caption {
+    display: flex;
+    width: calc(100% - var(--body-margin));
+    position: absolute;
+    bottom: var(--spacing-base-10-0);
+    z-index: 1;
+    margin: 0;
+    padding: var(--body-margin) var(--spacing-alias-responsive-200-to-400) 0;
+    background-color: var(--color-alias-surface-background-primary);
+    box-sizing: border-box;
+  }
+
+  .layout-1-col .image-left .imagetext-caption {
+    padding-right: var(--body-margin);
+    margin-left: var(--body-margin);
+    border-radius: var(--border-radius-1-col) 0 0 0;
+  }
+
+  .layout-1-col .image-right .imagetext-caption {
+    right: var(--body-margin);
+    padding-left: var(--body-margin);
+    border-radius: 0 var(--border-radius-1-col) 0 0;
+  }
+
+  .layout-1-col .imagetext-content-container.with-caption {
+    border-radius: 0;
+  }
+}
+
+/* Breakpoint - screen md and above */
+@media (min-width: 36rem) {
+  .image-and-text {
+    --heading-container-gap: var(--spacing-alias-fixed-150);
+    --border-radius-1-col: var(--border-radius-base-3-0);
+  }
+
+  .image-and-text-container.layout-2-col > .image-text-wrapper,
+  .image-and-text-container.layout-3-col.stacked > .image-text-wrapper,
+  .image-and-text-container.layout-4-col > .image-text-wrapper {
+    --content-gap: var(--spacing-comp-web-spacer-xxl);
+  }
+
+  .imagetext-badge {
+    --badge-padding-y: var(--badge-padding-y-md);
+    --badge-padding-x: var(--badge-padding-x-md);
+  }
+}
+
+/* Breakpoint - screen lg and above */
+@media (min-width: 64rem) {
+  .image-and-text {
+    --heading-container-gap: var(--spacing-alias-fixed-200);
+  }
+
+  .image-and-text-container.layout-2-col .image-and-text {
+    --content-gap: var(--spacing-comp-web-spacer-xxxl);
+  }
+
+  .image-and-text-container.layout-3-col .image-and-text,
+  .image-and-text-container.layout-3-col.stacked .image-and-text,
+  .image-and-text-container.layout-4-col .image-and-text {
+    --content-gap: var(--spacing-comp-web-spacer-xl);
+  }
+
+  .layout-3-col .imagetext-intro-text,
+  .layout-3-col .imagetext-intro-text p,
+  .layout-4-col .imagetext-intro-text,
+  .layout-4-col .imagetext-intro-text p {
+    /* Callout Styles */
+    font-weight: 400;
+    font-size: var(--font-size-alias-callout);
+    line-height: var(--line-height-alias-callout);
+  }
+
+  /* Horizontal Layout Styles */
+  .layout-1-col .image-and-text {
+    display: flex;
+    flex-direction: row;
+    gap: var(--body-gutter);
+  }
+
+  .layout-1-col .imagetext-image-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 var(--content-container-extra-padding);
+  }
+
+  .layout-1-col .imagetext-image-container img {
+    border-radius: var(--border-radius-alias-fixed-md);
+  }
+
+  /* Need to select both .image-left, .image-right to reset some styles set in sm / md */
+  .layout-1-col .image-left .imagetext-content-container,
+  .layout-1-col .image-right .imagetext-content-container {
+    position: unset;
+    padding: 0;
+    margin: 0;
+    flex: 1 1 var(--content-container-extra-padding);
+    box-sizing: border-box;
+    border-radius: 0;
+  }
+
+  /* Image Left Specific Styles */
+  .layout-1-col .image-left .imagetext-content-container {
+    padding-left: var(--content-container-extra-padding);
+  }
+
+  .layout-1-col:not(.image-curve-disabled) .image-left .imagetext-image-container img {
+    border-bottom-right-radius: var(--border-radius-terminal);
+  }
+
+  .layout-1-col .image-right .imagetext-image-container {
+    align-items: flex-end;
+  }
+
+  .layout-1-col:not(.image-curve-disabled) .image-right .imagetext-image-container img {
+    border-bottom-left-radius: var(--border-radius-terminal);
+  }
+
+  .layout-1-col .image-right .imagetext-content-container {
+    padding-right: var(--content-container-extra-padding);
+  }
+
+  /* Badge */
+
+  /* Reset uneven margin set in SM - MD */
+  .layout-1-col .imagetext-badge {
+    margin: var(--badge-margin);
+  }
+
+  .layout-1-col .imagetext-badge,
+  .layout-2-col .imagetext-badge {
+    --badge-margin: var(--spacing-comp-web-spacer-xxxl);
+    --badge-padding-y: var(--badge-padding-y-lg);
+    --badge-padding-x: var(--badge-padding-x-lg);
+    --badge-font-size: var(--badge-font-size-lg);
+    --badge-line-height: var(--badge-line-height-lg);
+  }
+
+  .layout-3-col .imagetext-badge {
+    --badge-margin: var(--spacing-comp-web-spacer-xl);
+    --badge-padding-y: var(--badge-padding-y-md);
+    --badge-padding-x: var(--badge-padding-x-md);
+  }
+
+  .layout-4-col .imagetext-badge {
+    --badge-margin: var(--spacing-comp-web-spacer-md);
+    --badge-padding-y: var(--badge-padding-y-sm);
+    --badge-padding-x: var(--badge-padding-x-sm);
+  }
+}

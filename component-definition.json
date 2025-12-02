@@ -158,30 +158,222 @@
           }
         },
         {
-          "title": "DM Image",
-          "id": "dm-image",
+          "title": "Icon and Text Container",
+          "id": "icon-and-text-container",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "DM Image",
-                  "model": "dm-image"
+                  "name": "Icon and Text Container",
+                  "model": "icon-and-text-container",
+                  "filter": "icon-and-text-container"
                 }
               }
             }
           }
         },
         {
-          "title": "Video",
-          "id": "video",
+          "title": "Icon and Text",
+          "id": "icon-and-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Icon and Text",
+                  "model": "icon-and-text"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Image and Text Container",
+          "id": "image-and-text-container",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "Video",
-                  "model": "video"
+                  "name": "Image and Text Container",
+                  "model": "image-and-text-container",
+                  "filter": "image-and-text-container"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Image and Text",
+          "id": "image-and-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Image and Text",
+                  "model": "image-and-text"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Link List",
+          "id": "link-list",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Link List",
+                  "model": "link-list",
+                  "filter": "link-list",
+                  "headingType": "h2",
+                  "heading": "Heading",
+                  "childPagesOrderBy": "jcr:title",
+                  "childPagesSortOrder": "ascending",
+                  "classes": "hyper-links"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Link",
+          "id": "link",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Link",
+                  "model": "link"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Custom Image One",
+          "id": "custom-asset-one",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Custom Image One",
+                  "model": "custom-asset-one"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Quote",
+          "id": "quote",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Quote",
+                  "model": "quote",
+                  "quote": "<p>Think, McFly! Think!</p>",
+                  "author": "Biff Tannen"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Logo",
+          "id": "logo",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Logo",
+                  "model": "logo"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Menu",
+          "id": "menu",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Menu",
+                  "model": "menu",
+                  "filter": "menu"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Menu Item",
+          "id": "menu-item",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Menu Item",
+                  "model": "menu-item"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Region Selector",
+          "id": "region-selector",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Region Selector",
+                  "model": "region-selector"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Login Widget",
+          "id": "login",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Login",
+                  "model": "login",
+                  "key-value": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Shopping Cart Widget",
+          "id": "shopping-cart-widget",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Shopping Cart Widget",
+                  "model": "shopping-cart-widget"
                 }
               }
             }

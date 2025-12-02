@@ -1,0 +1,34 @@
+{
+    "repoNames": [
+      "author-p66302-e574366.adobeaemcloud.com",
+      "delivery-p66302-e574366.adobeaemcloud.com"
+    ],
+   "aemTierType": [
+        "delivery",
+        "author"
+    ],
+    "expiryOptions": {
+        "allowSelectionAndDrag": false
+    },
+    "assetDomainMapping": {"delivery-p66302-e574366.adobeaemcloud.com": "https://dynamicmedia-openapi.scene7.com/"},
+    "filterSchema": [
+        {
+          "fields": [
+            {
+              "columns": 3,
+              "defaultValue": ["arena"],
+              "element": "taggroup",
+              "name": "property=xcm:keywords.id=",
+              "options": [
+                {
+                  "label": "Demo",
+                  "value": "demo"
+                }
+              ]
+            }
+          ],
+          "groupKey": "AssetTagsGroup",
+          "header": "Assets Tags"
+        }
+      ]
+}

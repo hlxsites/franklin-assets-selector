@@ -10,14 +10,22 @@
     "components": [
       "text",
       "image",
-      "dm-image",
-      "video",
       "button",
       "title",
       "hero",
       "cards",
       "columns",
-      "fragment"
+      "fragment",
+      "custom-asset-one",
+      "quote",
+      "icon-and-text-container",
+      "image-and-text-container",
+      "link-list",
+      "logo",
+      "menu",
+      "region-selector",
+      "login",
+      "shopping-cart-widget"
     ]
   },
   {
@@ -38,7 +46,32 @@
       "text",
       "image",
       "button",
-      "title"
+      "title",
+      "custom-asset-one"
+    ]
+  },
+  {
+    "id": "icon-and-text-container",
+    "components": [
+      "icon-and-text"
+    ]
+  },
+  {
+    "id": "image-and-text-container",
+    "components": [
+      "image-and-text"
+    ]
+  },
+  {
+    "id": "link-list",
+    "components": [
+      "link"
+    ]
+  },
+  {
+    "id": "menu",
+    "components": [
+      "menu-item"
     ]
   }
 ]

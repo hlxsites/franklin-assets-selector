@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Adobe. All rights reserved.
+ * Copyright 2025 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -16,12 +16,12 @@ function sampleRUM(checkpoint, data) {
   const timeShift = () => (window.performance ? window.performance.now() : Date.now() - window.hlx.rum.firstReadTime);
   try {
     window.hlx = window.hlx || {};
-    sampleRUM.enhance = () => {};
     if (!window.hlx.rum) {
+      sampleRUM.enhance = () => {};
       const param = new URLSearchParams(window.location.search).get('rum');
-      const weight = (window.SAMPLE_PAGEVIEWS_AT_RATE === 'high' && 10)
+      const weight = (param === 'on' && 1)
+        || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'high' && 10)
         || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'low' && 1000)
-        || (param === 'on' && 1)
         || 100;
       const id = Math.random().toString(36).slice(-4);
       const isSelected = param !== 'off' && Math.random() * weight < 1;
@@ -153,11 +153,12 @@ function setup() {
 }
 
 /**
- * Auto initializiation.
+ * Auto initialization.
  */
 
 function init() {
   setup();
+  sampleRUM.collectBaseURL = window.origin;
   sampleRUM();
 }
 
@@ -248,6 +249,41 @@ async function loadCSS(href) {
   });
 }
 
+// function appendQueryParams(url, params) {
+//   const { searchParams } = url;
+//   params.forEach((value, key) => {
+//     searchParams.set(key, value);
+//   });
+//   url.search = searchParams.toString();
+//   return url.toString();
+// }
+
+// function getUrlExtension(url) {
+//   return url.split(/[#?]/)[0].split('.').pop().trim();
+// }
+
+// /**
+//  * Checks if an element is an external image.
+//  * @param {Element} element The element
+//  * @param {string} externalImageMarker The marker for external images
+//  * @returns {boolean} Whether the element is an external image
+//  * @private
+//  */
+// // eslint-disable-next-line consistent-return
+// function isExternalImage(element, externalImageMarker) {
+//   // if the element is not an anchor, it's not an external image
+//   if (element.tagName !== 'A') return false;
+
+//   // if the element is an anchor with the external image marker as text content,
+//   // it's an external image
+//   if (element.textContent.trim() === externalImageMarker) {
+//     return true;
+//   }
+
+//   const ext = getUrlExtension(element.getAttribute('href'));
+//   return ext && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext.toLowerCase());
+// }
+
 /**
  * Loads a non module JS file.
  * @param {string} src URL to the JS file
@@ -301,9 +337,6 @@ function createOptimizedPicture(
   eager = false,
   breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
 ) {
-  if (window.hlx?.aemassets?.createOptimizedPicture) {
-    return window.hlx.aemassets.createOptimizedPicture(src, alt, eager, breakpoints);
-  }
   const url = new URL(src, window.location.href);
   const picture = document.createElement('picture');
   const { pathname } = url;
@@ -457,6 +490,8 @@ function decorateIcon(span, prefix = '', alt = '') {
   img.src = `${window.hlx.codeBasePath}${prefix}/icons/${iconName}.svg`;
   img.alt = alt;
   img.loading = 'lazy';
+  img.width = 16;
+  img.height = 16;
   span.append(img);
 }
 
@@ -466,11 +501,20 @@ function decorateIcon(span, prefix = '', alt = '') {
  * @param {string} [prefix] prefix to be added to icon the src
  */
 function decorateIcons(element, prefix = '') {
-  const icons = [...element.querySelectorAll('span.icon')];
+  const icons = element.querySelectorAll('span.icon');
   icons.forEach((span) => {
     decorateIcon(span, prefix);
   });
 }
+
+/*
+  * Decorates external images with a picture element
+  * @param {Element} ele The element
+  * @param {string} deliveryMarker The marker for external images
+  * @private
+  * @example
+  * decorateExternalImages(main, '//External Image//');
+  */
 
 /**
  * Decorates all sections in a container element.
@@ -515,43 +559,6 @@ function decorateSections(main) {
 }
 
 /**
- * Gets placeholders object.
- * @param {string} [prefix] Location of placeholders
- * @returns {object} Window placeholders object
- */
-// eslint-disable-next-line import/prefer-default-export
-async function fetchPlaceholders(prefix = 'default') {
-  window.placeholders = window.placeholders || {};
-  if (!window.placeholders[prefix]) {
-    window.placeholders[prefix] = new Promise((resolve) => {
-      fetch(`${prefix === 'default' ? '' : prefix}/placeholders.json`)
-        .then((resp) => {
-          if (resp.ok) {
-            return resp.json();
-          }
-          return {};
-        })
-        .then((json) => {
-          const placeholders = {};
-          json.data
-            .filter((placeholder) => placeholder.Key)
-            .forEach((placeholder) => {
-              placeholders[toCamelCase(placeholder.Key)] = placeholder.Text;
-            });
-          window.placeholders[prefix] = placeholders;
-          resolve(window.placeholders[prefix]);
-        })
-        .catch(() => {
-          // error loading placeholders
-          window.placeholders[prefix] = {};
-          resolve(window.placeholders[prefix]);
-        });
-    });
-  }
-  return window.placeholders[`${prefix}`];
-}
-
-/**
  * Builds a block DOM Element from a two dimensional array, string, or object
  * @param {string} blockName name of the block
  * @param {*} content two dimensional array or string or object of content
@@ -587,9 +594,6 @@ function buildBlock(blockName, content) {
  * @param {Element} block The block element
  */
 async function loadBlock(block) {
-  if (window.hlx?.aemassets?.loadBlock) {
-    return window.hlx.aemassets.loadBlock(block);
-  }
   const status = block.dataset.blockStatus;
   if (status !== 'loading' && status !== 'loaded') {
     block.dataset.blockStatus = 'loading';
@@ -638,7 +642,7 @@ function decorateBlock(block) {
     const section = block.closest('.section');
     if (section) section.classList.add(`${shortBlockName}-container`);
     // eslint-disable-next-line no-use-before-define
-    decorateButtons(block);
+    // decorateButtons(block); // Commented out - blocks handle their own button styling
   }
 }
 
@@ -738,7 +742,7 @@ export {
   decorateIcons,
   decorateSections,
   decorateTemplateAndTheme,
-  fetchPlaceholders,
+  // decorateExternalImages,
   getMetadata,
   loadBlock,
   loadCSS,
