@@ -22,7 +22,7 @@
         "component": "custom-asset-namespace:custom-asset",
         "name": "image",
         "label": "Image",
-        "configUrl": "https://274796-hlxassetaddonconfig-stage.adobeio-static.net/api/v1/web/hlx-asset-addon-config/ue-extn-config",
+        "configUrl": "/content/dam/Gazal-ue-site/config.json",
         "valueType": "string"
       },
       {
